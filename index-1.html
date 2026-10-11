@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Northern Province Distribution & Management System</title>
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --secondary: #1e293b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --border-color: #e2e8f0;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 15px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            background: linear-gradient(135deg, var(--secondary), #0f172a);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        header h1 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+        header p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        .user-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        /* Login Screen */
+        #loginScreen {
+            max-width: 420px;
+            margin: 40px auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+        #loginScreen h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--secondary);
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .tab-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+        h2 {
+            font-size: 1.15rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border 0.2s;
+            background: #fff;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+        }
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-info { background: #e0f2fe; color: #0369a1; }
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .calc-box {
+            background: #f8fafc;
+            border: 1px dashed var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        .role-admin-only { display: none; }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+    <h2>Northern Province System Login</h2>
+    <div id="loginAlert" class="alert alert-danger"></div>
+    <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+            <label>Login As</label>
+            <select id="loginRole" onchange="toggleLoginInputs()" required>
+                <option value="admin">Admin (Owner)</option>
+                <option value="ref">Sales Representative (Ref)</option>
+            </select>
+        </div>
+        <div class="form-group" id="refIdGroup" style="display:none;">
+            <label>Ref ID / Username</label>
+            <input type="text" id="loginRefIdInput" placeholder="Enter your Ref ID">
+        </div>
+        <div class="form-group" id="refPassGroup" style="display:none;">
+            <label>Ref Password</label>
+            <input type="password" id="loginRefPassInput" placeholder="Enter your Password">
+        </div>
+        <div class="form-group" id="adminPassGroup">
+            <label>Admin Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter Admin Password (e.g. admin123)">
+        </div>
+        <button type="submit" class="btn">Login to System</button>
+    </form>
+    <div style="margin-top: 15px; font-size: 0.8rem; color: #64748b; line-height: 1.4; text-align: center;">
+        💡 Admin can create new custom Refs & passwords in the 'Manage Refs' tab.
+    </div>
+</div>
+
+<!-- MAIN APP CONTAINER -->
+<div id="mainApp" class="container" style="display:none;">
+    <header>
+        <div>
+            <h1 id="appHeaderTitle">Northern Province Distribution System</h1>
+            <p>Home-based Stock & Sales Representative Management</p>
+        </div>
+        <div class="user-badge">
+            <span id="loggedInUserDisplay">User: Admin</span>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="nav-tabs" id="navTabsContainer">
+        <button class="tab-btn active" onclick="switchTab('stock')">📦 Current Stock</button>
+        <button class="tab-btn role-admin-only" onclick="switchTab('addstock')">➕ Stock In (Plus)</button>
+        <button class="tab-btn role-admin-only" onclick="switchTab('newproduct')">🆕 Add Product</button>
+        <button class="tab-btn role-admin-only" onclick="switchTab('manage-refs')">👥 Manage Refs</button>
+        <button class="tab-btn" onclick="switchTab('order')">🛒 Shop Order</button>
+        <button class="tab-btn" onclick="switchTab('history')">📜 Order History</button>
+    </div>
+
+    <!-- 1. CURRENT STOCK TAB -->
+    <div id="stock" class="tab-content active">
+        <div class="card">
+            <h2>Current Warehouse Inventory (Northern Province)</h2>
+            <div style="overflow-x: auto;">
+                <table id="stockTable">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Stock Qty</th>
+                            <th>Free Offer Rule</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. STOCK IN (ADMIN ONLY) -->
+    <div id="addstock" class="tab-content role-admin-only">
+        <div class="card">
+            <h2>Stock In / Update Existing Stock (Plus)</h2>
+            <div id="addStockAlert" class="alert"></div>
+            <form id="addStockForm" onsubmit="handleStockIn(event)">
+                <div class="form-group">
+                    <label>Select Product</label>
+                    <select id="updateProductSelect" required></select>
+                </div>
+                <div class="form-group">
+                    <label>New Quantity to Add (Plus)</label>
+                    <input type="number" id="addQty" min="1" placeholder="Enter quantity received" required>
+                </div>
+                <button type="submit" class="btn">Update Stock (Plus)</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. ADD NEW PRODUCT (ADMIN ONLY) -->
+    <div id="newproduct" class="tab-content role-admin-only">
+        <div class="card">
+            <h2>Add New Product & Offer Rules</h2>
+            <div id="newProductAlert" class="alert"></div>
+            <form id="newProductForm" onsubmit="handleNewProduct(event)">
+                <div class="form-group">
+                    <label>Product Name (Soda, Stationery, Axe Oil, etc.)</label>
+                    <input type="text" id="newProdName" placeholder="Enter product name" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="newProdCategory">
+                        <option value="Soda">Soda</option>
+                        <option value="Stationery">Stationery</option>
+                        <option value="Axe Oil">Axe Oil</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Initial Stock Quantity</label>
+                    <input type="number" id="newProdQty" min="0" placeholder="Initial stock count" required>
+                </div>
+                <div class="form-group">
+                    <label>Free Offer Buy Qty (e.g. Buy 10)</label>
+                    <input type="number" id="newBuyQty" min="0" value="0" placeholder="0 if no offer">
+                </div>
+                <div class="form-group">
+                    <label>Free Offer Get Qty (e.g. Get 1 Free)</label>
+                    <input type="number" id="newFreeQty" min="0" value="0" placeholder="0 if no offer">
+                </div>
+                <button type="submit" class="btn">Save New Product</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. MANAGE REFS (ADMIN ONLY) -->
+    <div id="manage-refs" class="tab-content role-admin-only">
+        <div class="card">
+            <h2>Manage Sales Representatives (Reps & Custom Passwords)</h2>
+            <div id="refAlert" class="alert"></div>
+            <form id="addRefForm" onsubmit="handleAddRef(event)">
+                <div class="form-group">
+                    <label>Ref Name</label>
+                    <input type="text" id="refName" placeholder="e.g. Kumar / Anojan" required>
+                </div>
+                <div class="form-group">
+                    <label>Ref ID / Username</label>
+                    <input type="text" id="refId" placeholder="e.g. REF001" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="text" id="refPass" placeholder="Enter custom password" required>
+                </div>
+                <button type="submit" class="btn">Add / Update Sales Rep</button>
+            </form>
+            <div style="margin-top: 20px;">
+                <h3>Active Sales Reps List</h3>
+                <div style="overflow-x: auto;">
+                    <table id="refsTable">
+                        <thead>
+                            <tr>
+                                <th>Ref ID</th>
+                                <th>Name</th>
+                                <th>Password</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. SHOP ORDER (REF & ADMIN) -->
+    <div id="order" class="tab-content">
+        <div class="card">
+            <h2>Shop Order Processing & Dispatch</h2>
+            <div id="orderAlert" class="alert"></div>
+            <form id="orderForm" onsubmit="handleOrder(event)">
+                <div class="form-group">
+                    <label>Shop Name</label>
+                    <input type="text" id="shopName" placeholder="e.g. Anbu Stores / Jeyan General Store" required>
+                </div>
+                <div class="form-group">
+                    <label>Shop Address / Location (Northern Province)</label>
+                    <input type="text" id="shopAddress" placeholder="e.g. Main Street, Kilinochchi / Jaffna" required>
+                </div>
+                <div class="form-group">
+                    <label>Select Product</label>
+                    <select id="orderProductSelect" onchange="calculateOffer()" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Order Quantity Needed</label>
+                    <input type="number" id="orderQty" min="1" placeholder="Enter quantity requested by shop" oninput="calculateOffer()" required>
+                </div>
+                <div class="calc-box" id="offerCalcBox">
+                    Select a product and quantity to check availability and free offers.
+                </div>
+                <br>
+                <button type="submit" class="btn">Confirm Order & Minus Stock</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 6. ORDER HISTORY -->
+    <div id="history" class="tab-content">
+        <div class="card">
+            <h2 id="historyTitle">Order History & Dispatch Records</h2>
+            <div style="overflow-x: auto;">
+                <table id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Ref Name (ID)</th>
+                            <th>Shop Name & Address</th>
+                            <th>Product</th>
+                            <th>Qty Dispatched</th>
+                            <th>Free Given</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let defaultProducts = [
+        { id: 1, name: 'Elephant House Soda 1.5L', category: 'Soda', qty: 150, buyQty: 10, freeQty: 1 },
+        { id: 2, name: 'Atlas Note Book 120 Pages', category: 'Stationery', qty: 300, buyQty: 12, freeQty: 2 },
+        { id: 3, name: 'Axe Oil 25ml Bottle', category: 'Axe Oil', qty: 80, buyQty: 5, freeQty: 1 }
+    ];
+
+    let defaultRefs = [];
+
+    let products = JSON.parse(localStorage.getItem('np_products_v5')) || defaultProducts;
+    let salesReps = JSON.parse(localStorage.getItem('np_refs_v5')) || defaultRefs;
+    let orderHistory = JSON.parse(localStorage.getItem('np_history_v5')) || [];
+    let currentUser = JSON.parse(localStorage.getItem('np_current_user_v5')) || null;
+
+    function saveData() {
+        localStorage.setItem('np_products_v5', JSON.stringify(products));
+        localStorage.setItem('np_refs_v5', JSON.stringify(salesReps));
+        localStorage.setItem('np_history_v5', JSON.stringify(orderHistory));
+        localStorage.setItem('np_current_user_v5', JSON.stringify(currentUser));
+    }
+
+    function toggleLoginInputs() {
+        const role = document.getElementById('loginRole').value;
+        const refIdGroup = document.getElementById('refIdGroup');
+        const refPassGroup = document.getElementById('refPassGroup');
+        const adminPassGroup = document.getElementById('adminPassGroup');
+
+        if(role === 'ref') {
+            refIdGroup.style.display = 'block';
+            refPassGroup.style.display = 'block';
+            adminPassGroup.style.display = 'none';
+        } else {
+            refIdGroup.style.display = 'none';
+            refPassGroup.style.display = 'none';
+            adminPassGroup.style.display = 'block';
+        }
+    }
+
+    function handleLogin(e) {
+        e.preventDefault();
+        const role = document.getElementById('loginRole').value;
+        const alertBox = document.getElementById('loginAlert');
+        alertBox.style.display = 'none';
+
+        if(role === 'admin') {
+            const pass = document.getElementById('loginPassword').value;
+            if(pass === 'admin123' || pass === '') {
+                currentUser = { role: 'admin', name: 'Admin (Owner)', id: 'ADMIN' };
+                saveData();
+                initApp();
+            } else {
+                alertBox.textContent = "Incorrect Admin Password! (Default: admin123)";
+                alertBox.style.display = 'block';
+            }
+        } else {
+            const refIdInput = document.getElementById('loginRefIdInput').value.trim();
+            const refPassInput = document.getElementById('loginRefPassInput').value.trim();
+
+            const refObj = salesReps.find(r => r.id.toLowerCase() === refIdInput.toLowerCase() && r.pass === refPassInput);
+            if(refObj) {
+                currentUser = { role: 'ref', name: refObj.name, id: refObj.id };
+                saveData();
+                initApp();
+            } else {
+                alertBox.textContent = "Invalid Ref ID or Password! Please ask Admin to create your account.";
+                alertBox.style.display = 'block';
+            }
+        }
+    }
+
+    function handleLogout() {
+        currentUser = null;
+        saveData();
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('loginScreen').style.display = 'block';
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('loginRefIdInput').value = '';
+        document.getElementById('loginRefPassInput').value = '';
+    }
+
+    function initApp() {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+
+        const adminElements = document.querySelectorAll('.role-admin-only');
+
+        if(currentUser.role === 'admin') {
+            adminElements.forEach(el => el.style.display = 'block');
+            document.getElementById('loggedInUserDisplay').textContent = `User: ${currentUser.name}`;
+            switchTab('stock');
+        } else {
+            adminElements.forEach(el => el.style.display = 'none');
+            document.getElementById('loggedInUserDisplay').textContent = `Ref: ${currentUser.name} (${currentUser.id})`;
+            switchTab('order');
+        }
+        renderStockTable();
+        renderProductDropdowns();
+        renderRefsTable();
+        renderHistoryTable();
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            if(btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabId)) {
+                btn.classList.add('active');
+            }
+        });
+
+        if(tabId === 'stock') renderStockTable();
+        if(tabId === 'addstock' || tabId === 'order') renderProductDropdowns();
+        if(tabId === 'manage-refs') renderRefsTable();
+        if(tabId === 'history') renderHistoryTable();
+    }
+
+    function renderStockTable() {
+        const tbody = document.querySelector('#stockTable tbody');
+        tbody.innerHTML = '';
+        products.forEach(p => {
+            let statusBadge = p.qty > 10 ? '<span class="badge badge-success">Available</span>' : (p.qty > 0 ? '<span class="badge badge-warning">Low Stock</span>' : '<span class="badge badge-danger">Out of Stock</span>');
+            let offerText = p.buyQty > 0 ? `Buy ${p.buyQty} Get ${p.freeQty} Free` : 'No Offer';
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${p.name}</strong></td>
+                <td>${p.category}</td>
+                <td><strong>${p.qty}</strong></td>
+                <td>${offerText}</td>
+                <td>${statusBadge}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderProductDropdowns() {
+        const updateSelect = document.getElementById('updateProductSelect');
+        const orderSelect = document.getElementById('orderProductSelect');
+        
+        if(updateSelect) updateSelect.innerHTML = '<option value="">-- Choose Product --</option>';
+        if(orderSelect) orderSelect.innerHTML = '<option value="">-- Choose Product --</option>';
+
+        products.forEach(p => {
+            if(updateSelect) {
+                let opt1 = document.createElement('option');
+                opt1.value = p.id;
+                opt1.textContent = `${p.name} (Stock: ${p.qty})`;
+                updateSelect.appendChild(opt1);
+            }
+            if(orderSelect) {
+                let opt2 = document.createElement('option');
+                opt2.value = p.id;
+                opt2.textContent = `${p.name} (Stock: ${p.qty})`;
+                orderSelect.appendChild(opt2);
+            }
+        });
+        calculateOffer();
+    }
+
+    function handleStockIn(e) {
+        e.preventDefault();
+        const prodId = parseInt(document.getElementById('updateProductSelect').value);
+        const addQty = parseInt(document.getElementById('addQty').value);
+        const alertBox = document.getElementById('addStockAlert');
+
+        let product = products.find(p => p.id === prodId);
+        if (product && addQty > 0) {
+            product.qty += addQty;
+            saveData();
+            alertBox.className = "alert alert-success";
+            alertBox.textContent = `Success! Added ${addQty} to ${product.name}. New Total Stock: ${product.qty}`;
+            alertBox.style.display = 'block';
+            document.getElementById('addStockForm').reset();
+            renderProductDropdowns();
+        }
+    }
+
+    function handleNewProduct(e) {
+        e.preventDefault();
+        const name = document.getElementById('newProdName').value.trim();
+        const category = document.getElementById('newProdCategory').value;
+        const qty = parseInt(document.getElementById('newProdQty').value);
+        const buyQty = parseInt(document.getElementById('newBuyQty').value) || 0;
+        const freeQty = parseInt(document.getElementById('newFreeQty').value) || 0;
+        const alertBox = document.getElementById('newProductAlert');
+
+        const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+        products.push({ id: newId, name, category, qty, buyQty, freeQty });
+        saveData();
+
+        alertBox.className = "alert alert-success";
+        alertBox.textContent = `New product '${name}' successfully added!`;
+        alertBox.style.display = 'block';
+        document.getElementById('newProductForm').reset();
+        renderStockTable();
+    }
+
+    function handleAddRef(e) {
+        e.preventDefault();
+        const name = document.getElementById('refName').value.trim();
+        const id = document.getElementById('refId').value.trim();
+        const pass = document.getElementById('refPass').value.trim();
+        const alertBox = document.getElementById('refAlert');
+
+        let existingRef = salesReps.find(r => r.id === id);
+        if(existingRef) {
+            existingRef.name = name;
+            existingRef.pass = pass;
+            alertBox.className = "alert alert-success";
+            alertBox.textContent = `Sales Representative '${name}' (${id}) updated successfully!`;
+        } else {
+            salesReps.push({ id, name, pass });
+            alertBox.className = "alert alert-success";
+            alertBox.textContent = `Sales Representative '${name}' (${id}) added successfully!`;
+        }
+
+        saveData();
+        alertBox.style.display = 'block';
+        document.getElementById('addRefForm').reset();
+        renderRefsTable();
+    }
+
+    function renderRefsTable() {
+        const tbody = document.querySelector('#refsTable tbody');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+        if(salesReps.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#64748b;">No Sales Reps created yet. Add one above!</td></tr>`;
+            return;
+        }
+        salesReps.forEach(r => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${r.id}</strong></td>
+                <td>${r.name}</td>
+                <td>${r.pass}</td>
+                <td><button class="logout-btn" style="background:var(--danger);" onclick="deleteRef('${r.id}')">Delete</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function deleteRef(id) {
+        if(confirm("Are you sure you want to delete this Sales Rep?")) {
+            salesReps = salesReps.filter(r => r.id !== id);
+            saveData();
+            renderRefsTable();
+        }
+    }
+
+    function calculateOffer() {
+        const prodId = parseInt(document.getElementById('orderProductSelect').value);
+        const orderQty = parseInt(document.getElementById('orderQty').value) || 0;
+        const calcBox = document.getElementById('offerCalcBox');
+
+        if (!prodId || orderQty <= 0) {
+            calcBox.innerHTML = "Select a product and enter order quantity to check availability and free offers.";
+            return;
+        }
+
+        let product = products.find(p => p.id === prodId);
+        if (!product) return;
+
+        let freeGiven = 0;
+        if (product.buyQty > 0 && product.freeQty > 0) {
+            let sets = Math.floor(orderQty / product.buyQty);
+            freeGiven = sets * product.freeQty;
+        }
+
+        let stockStatusHTML = "";
+        if (product.qty <= 0) {
+            stockStatusHTML = `<span style="color:var(--danger); font-weight:bold;">❌ Stock Finished / Out of Stock!</span>`;
+        } else if (orderQty > product.qty) {
+            stockStatusHTML = `<span style="color:var(--danger); font-weight:bold;">⚠️ Insufficient Stock! Only ${product.qty} left.</span>`;
+        } else {
+            stockStatusHTML = `<span style="color:var(--primary-dark); font-weight:bold;">✅ Stock Available.</span>`;
+        }
+
+        calcBox.innerHTML = `
+            <div><strong>Stock Check:</strong> ${stockStatusHTML}</div>
+            <div style="margin-top: 5px;"><strong>Free Offer Calculation:</strong> For ${orderQty} units, Free Items = <span style="color:var(--primary); font-weight:bold;">${freeGiven} ${product.name}</span></div>
+        `;
+    }
+
+    function handleOrder(e) {
+        e.preventDefault();
+        const shopName = document.getElementById('shopName').value.trim();
+        const shopAddress = document.getElementById('shopAddress').value.trim();
+        const prodId = parseInt(document.getElementById('orderProductSelect').value);
+        const orderQty = parseInt(document.getElementById('orderQty').value);
+        const alertBox = document.getElementById('orderAlert');
+
+        let product = products.find(p => p.id === prodId);
+        if (!product) return;
+
+        if (product.qty <= 0 || orderQty > product.qty) {
+            alertBox.className = "alert alert-danger";
+            alertBox.textContent = `Order Failed! Not enough stock available.`;
+            alertBox.style.display = 'block';
+            return;
+        }
+
+        product.qty -= orderQty;
+
+        let freeGiven = 0;
+        if (product.buyQty > 0 && product.freeQty > 0) {
+            freeGiven = Math.floor(orderQty / product.buyQty) * product.freeQty;
+        }
+
+        const now = new Date();
+        const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+
+        orderHistory.unshift({
+            dateTime: dateStr,
+            refName: currentUser.name,
+            refId: currentUser.id,
+            shopName: shopName,
+            shopAddress: shopAddress,
+            productName: product.name,
+            qty: orderQty,
+            freeGiven: freeGiven
+        });
+
+        saveData();
+
+        alertBox.className = "alert alert-success";
+        alertBox.textContent = `Order confirmed! Dispatched to ${shopName}. Remaining Stock: ${product.qty}`;
+        alertBox.style.display = 'block';
+
+        document.getElementById('orderForm').reset();
+        calculateOffer();
+        renderStockTable();
+        renderHistoryTable();
+    }
+
+    function renderHistoryTable() {
+        const tbody = document.querySelector('#historyTable tbody');
+        const historyTitle = document.getElementById('historyTitle');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+
+        let filteredHistory = orderHistory;
+        
+        if(currentUser.role === 'ref') {
+            filteredHistory = orderHistory.filter(h => h.refId === currentUser.id);
+            historyTitle.textContent = `My Order History (${currentUser.name})`;
+        } else {
+            historyTitle.textContent = `All Sales Reps Order History (Admin View)`;
+        }
+
+        if(filteredHistory.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b;">No orders recorded yet.</td></tr>`;
+            return;
+        }
+
+        filteredHistory.forEach(h => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><small>${h.dateTime}</small></td>
+                <td><strong>${h.refName}</strong><br><small>(${h.refId})</small></td>
+                <td><strong>${h.shopName}</strong><br><small>${h.shopAddress}</small></td>
+                <td>${h.productName}</td>
+                <td><span class="badge badge-info">${h.qty} units</span></td>
+                <td><span class="badge badge-success">${h.freeGiven} free</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    if(currentUser) {
+        initApp();
+    } else {
+        toggleLoginInputs();
+    }
+</script>
+
+</body>
+</html>
