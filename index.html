@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Northern Province Distribution & Management System</title>
+    <title>RAJ BROTHERS MARKETING - Distribution & Management System</title>
     <style>
         :root {
             --primary: #1e3a8a;
@@ -97,12 +97,15 @@
             border-collapse: collapse;
             margin-top: 1rem;
             background: white;
+            overflow-x: auto;
+            display: block;
         }
 
         th, td {
             border: 1px solid var(--border-color);
             padding: 0.75rem;
             text-align: left;
+            white-space: nowrap;
         }
 
         th {
@@ -110,13 +113,10 @@
             color: var(--primary);
         }
 
-        .flex-row {
-            display: flex;
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
-        }
-
-        .flex-row > div {
-            flex: 1;
         }
 
         .hidden {
@@ -132,7 +132,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
@@ -145,6 +145,11 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
+        .stat-card.highlight {
+            border-left-color: var(--secondary);
+            background-color: #f0fdf4;
+        }
+
         .stat-card h4 {
             margin: 0 0 0.5rem 0;
             color: #6b7280;
@@ -153,9 +158,13 @@
 
         .stat-card p {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: bold;
             color: var(--primary);
+        }
+
+        .stat-card.highlight p {
+            color: var(--secondary);
         }
 
         .tab-buttons {
@@ -179,10 +188,22 @@
             color: white;
         }
 
+        .product-card-ref {
+            padding: 0.75rem;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         @media (max-width: 768px) {
-            .flex-row {
+            .product-card-ref {
                 flex-direction: column;
-                gap: 0;
+                align-items: flex-start;
+                gap: 0.5rem;
             }
         }
     </style>
@@ -190,7 +211,7 @@
 <body>
 
     <header>
-        <h1>Northern Province Distribution System</h1>
+        <h1>RAJ BROTHERS MARKETING</h1>
         <p>Stock, Sales & Representative Management System</p>
     </header>
 
@@ -208,12 +229,12 @@
             <div id="form-login">
                 <div class="form-group">
                     <label>Role:</label>
-                    <select id="login-role" onchange="toggleLoginInputs()">
+                    <select id="login-role">
                         <option value="admin">Admin</option>
                         <option value="ref">Sales Representative</option>
                     </select>
                 </div>
-                <div class="form-group" id="login-username-group">
+                <div class="form-group">
                     <label>Username / ID:</label>
                     <input type="text" id="login-user" placeholder="Enter your username">
                 </div>
@@ -236,7 +257,7 @@
                 </div>
                 <div class="form-group">
                     <label>Choose Username / ID:</label>
-                    <input type="text" id="reg-user" placeholder="e.g. admin_puvi or ref_jaffna">
+                    <input type="text" id="reg-user" placeholder="e.g. admin_raj or ref_jaffna">
                 </div>
                 <div class="form-group">
                     <label>Choose Password:</label>
@@ -251,13 +272,18 @@
             <div class="card">
                 <button class="logout-btn" onclick="logout()">Logout</button>
                 <h2 id="admin-welcome-title">Admin Control Panel</h2>
-                <p>Manage your inventory, custom products, reps, and monitor sales performance.</p>
+                <p>Manage your inventory, custom prices, reps, and monitor sales performance.</p>
             </div>
 
+            <!-- SUMMARY STATS WITH STOCK VALUE -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h4>Total Warehouse Items</h4>
-                    <p id="stat-total-stock">0</p>
+                    <h4>Total Available Stocks</h4>
+                    <p id="stat-total-stock">0 Units</p>
+                </div>
+                <div class="stat-card highlight">
+                    <h4>Total Stock Value (Ex Dealer Value)</h4>
+                    <p id="stat-total-value">LKR 0.00</p>
                 </div>
                 <div class="stat-card">
                     <h4>Active Sales Reps</h4>
@@ -271,8 +297,9 @@
 
             <!-- Manage Products & Inventory -->
             <div class="card">
-                <h3>Manage Products & Warehouse Stock (Soda, Axe Oil, etc.)</h3>
-                <div class="flex-row">
+                <h3>Manage Products & Warehouse Stock</h3>
+                
+                <div class="grid-2">
                     <div class="form-group">
                         <label>Product Name:</label>
                         <input type="text" id="prod-name" placeholder="e.g., Soda, Axe Oil">
@@ -282,19 +309,36 @@
                         <input type="number" id="prod-price" placeholder="0.00">
                     </div>
                     <div class="form-group">
-                        <label>Initial Stock Quantity:</label>
+                        <label>Available Stocks (Quantity):</label>
                         <input type="number" id="prod-stock" placeholder="0">
                     </div>
+                    <div class="form-group">
+                        <label>Ex Factory Price (LKR):</label>
+                        <input type="number" id="prod-ex-factory" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Ex Dealer Price (LKR):</label>
+                        <input type="number" id="prod-ex-dealer" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>MRP (Maximum Retail Price) (LKR):</label>
+                        <input type="number" id="prod-mrp" placeholder="0.00">
+                    </div>
                 </div>
+
                 <button onclick="saveProduct()">Add / Update Product</button>
 
-                <h4 style="margin-top: 1.5rem;">Current Warehouse Inventory</h4>
+                <h4 style="margin-top: 1.5rem;">Current Warehouse Inventory & Pricing</h4>
                 <table>
                     <thead>
                         <tr>
                             <th>Product Name</th>
-                            <th>Unit Price (LKR)</th>
-                            <th>Available Stock</th>
+                            <th>Unit Price</th>
+                            <th>Available Stocks</th>
+                            <th>Ex Factory Price</th>
+                            <th>Ex Dealer Price</th>
+                            <th>MRP</th>
+                            <th>Total Dealer Value</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -305,7 +349,7 @@
             <!-- Manage Sales Reps -->
             <div class="card">
                 <h3>Manage Sales Representatives (Refs)</h3>
-                <div class="flex-row">
+                <div class="grid-2">
                     <div class="form-group">
                         <label>Representative ID / Username:</label>
                         <input type="text" id="ref-username" placeholder="e.g. ref1">
@@ -354,7 +398,7 @@
             <div class="card">
                 <button class="logout-btn" onclick="logout()">Logout</button>
                 <h2 id="ref-welcome-title">Sales Representative Portal</h2>
-                <p>Record new orders, track stock reduction, and check your sales history.</p>
+                <p>Record new orders using Ex Dealer Price and MRP, track stock reduction, and check sales history.</p>
             </div>
 
             <div class="card">
@@ -364,13 +408,13 @@
                     <input type="text" id="order-shop" placeholder="Enter shop name">
                 </div>
                 
-                <h4>Select Products</h4>
+                <h4>Select Products & Quantities</h4>
                 <div id="ref-product-selection-list">
                     <!-- Dynamic product rows for ordering -->
                 </div>
                 
                 <div style="margin-top: 1rem; font-weight: bold; font-size: 1.2rem;">
-                    Estimated Total: LKR <span id="order-calc-total">0.00</span>
+                    Estimated Order Total (at Ex Dealer Price): LKR <span id="order-calc-total">0.00</span>
                 </div>
                 <button style="margin-top: 1rem;" onclick="submitOrder()">Submit Order</button>
             </div>
@@ -394,18 +438,18 @@
     </div>
 
     <script>
-        // Database Setup with Persistent LocalStorage
-        let db = JSON.parse(localStorage.getItem('northern_dist_db_v7')) || {
-            admins: [],   // Custom created admin accounts
-            products: [], // Custom warehouse items
-            refs: [],     // Custom sales representatives
-            orders: []    // Transaction logs
+        // Database Setup with Persistent LocalStorage V10
+        let db = JSON.parse(localStorage.getItem('raj_brothers_db_v10')) || {
+            admins: [],   
+            products: [], 
+            refs: [],     
+            orders: []    
         };
 
         let currentUser = null;
 
         function saveData() {
-            localStorage.setItem('northern_dist_db_v7', JSON.stringify(db));
+            localStorage.setItem('raj_brothers_db_v10', JSON.stringify(db));
         }
 
         function switchTab(tab) {
@@ -425,10 +469,6 @@
                 regForm.classList.remove('hidden');
                 loginForm.classList.add('hidden');
             }
-        }
-
-        function toggleLoginInputs() {
-            // Can be expanded if needed
         }
 
         function handleRegister() {
@@ -476,7 +516,6 @@
             }
 
             if (role === 'admin') {
-                // Check custom admins or allow default fallback if db.admins is empty for first-time convenience
                 let adminObj = db.admins.find(a => a.username === username && a.password === password);
                 if (!adminObj && db.admins.length === 0 && username === 'admin' && password === 'admin123') {
                     adminObj = { username: 'admin' };
@@ -489,7 +528,7 @@
                     document.getElementById('admin-welcome-title').textContent = `Admin Control Panel - Welcome, ${username}`;
                     loadAdminData();
                 } else {
-                    alert('Invalid Admin username or password! (Note: If no admin is registered yet, you can register one via the Register tab).');
+                    alert('Invalid Admin username or password!');
                 }
             } else {
                 const refObj = db.refs.find(r => r.username === username && r.password === password);
@@ -499,7 +538,7 @@
                     document.getElementById('ref-dashboard').classList.remove('hidden');
                     loadRefData();
                 } else {
-                    alert('Invalid Representative username or password! Please check or ask Admin to verify.');
+                    alert('Invalid Representative username or password!');
                 }
             }
         }
@@ -516,7 +555,11 @@
 
         // --- ADMIN FUNCTIONS ---
         function loadAdminData() {
-            document.getElementById('stat-total-stock').textContent = db.products.reduce((sum, p) => sum + parseInt(p.stock || 0), 0);
+            let totalStockQty = db.products.reduce((sum, p) => sum + parseInt(p.stock || 0), 0);
+            let totalStockVal = db.products.reduce((sum, p) => sum + (parseInt(p.stock || 0) * parseFloat(p.exDealer || p.price || 0)), 0);
+
+            document.getElementById('stat-total-stock').textContent = `${totalStockQty} Units`;
+            document.getElementById('stat-total-value').textContent = `LKR ${totalStockVal.toFixed(2)}`;
             document.getElementById('stat-total-refs').textContent = db.refs.length;
             document.getElementById('stat-total-orders').textContent = db.orders.length;
 
@@ -524,14 +567,19 @@
             const invTable = document.getElementById('admin-inventory-table');
             invTable.innerHTML = '';
             if (db.products.length === 0) {
-                invTable.innerHTML = '<tr><td colspan="4" style="text-align:center;">No products added yet. Add items like Soda, Axe Oil below.</td></tr>';
+                invTable.innerHTML = '<tr><td colspan="8" style="text-align:center;">No products added yet. Fill the details above to add items.</td></tr>';
             } else {
                 db.products.forEach((p, index) => {
+                    let totalDealerVal = p.stock * (p.exDealer || p.price || 0);
                     invTable.innerHTML += `
                         <tr>
-                            <td>${p.name}</td>
-                            <td>LKR ${parseFloat(p.price).toFixed(2)}</td>
+                            <td><strong>${p.name}</strong></td>
+                            <td>LKR ${parseFloat(p.price || 0).toFixed(2)}</td>
                             <td>${p.stock}</td>
+                            <td>LKR ${parseFloat(p.exFactory || 0).toFixed(2)}</td>
+                            <td>LKR ${parseFloat(p.exDealer || 0).toFixed(2)}</td>
+                            <td>LKR ${parseFloat(p.mrp || 0).toFixed(2)}</td>
+                            <td>LKR ${totalDealerVal.toFixed(2)}</td>
                             <td><button class="btn-danger" style="padding:0.25rem 0.5rem; width:auto;" onclick="deleteProduct(${index})">Delete</button></td>
                         </tr>
                     `;
@@ -562,7 +610,7 @@
                 ordersTable.innerHTML = '<tr><td colspan="6" style="text-align:center;">No orders recorded yet.</td></tr>';
             } else {
                 db.orders.slice().reverse().forEach(o => {
-                    let itemsStr = o.items.map(i => `${i.name} (Qty: ${i.qty})`).join(', ');
+                    let itemsStr = o.items.map(i => `${i.name} (Qty: ${i.qty} @ LKR ${i.dealerPrice})`).join(', ');
                     ordersTable.innerHTML += `
                         <tr>
                             <td>#${o.id}</td>
@@ -579,11 +627,14 @@
 
         function saveProduct() {
             const name = document.getElementById('prod-name').value.trim();
-            const price = parseFloat(document.getElementById('prod-price').value);
-            const stock = parseInt(document.getElementById('prod-stock').value);
+            const price = parseFloat(document.getElementById('prod-price').value) || 0;
+            const stock = parseInt(document.getElementById('prod-stock').value) || 0;
+            const exFactory = parseFloat(document.getElementById('prod-ex-factory').value) || 0;
+            const exDealer = parseFloat(document.getElementById('prod-ex-dealer').value) || 0;
+            const mrp = parseFloat(document.getElementById('prod-mrp').value) || 0;
 
-            if (!name || isNaN(price) || isNaN(stock)) {
-                alert('Please fill out all product details correctly.');
+            if (!name) {
+                alert('Please enter a product name.');
                 return;
             }
 
@@ -591,16 +642,23 @@
             if (existing) {
                 existing.price = price;
                 existing.stock += stock;
+                existing.exFactory = exFactory;
+                existing.exDealer = exDealer;
+                existing.mrp = mrp;
             } else {
-                db.products.push({ name, price, stock });
+                db.products.push({ name, price, stock, exFactory, exDealer, mrp });
             }
 
             saveData();
             document.getElementById('prod-name').value = '';
             document.getElementById('prod-price').value = '';
             document.getElementById('prod-stock').value = '';
+            document.getElementById('prod-ex-factory').value = '';
+            document.getElementById('prod-ex-dealer').value = '';
+            document.getElementById('prod-mrp').value = '';
+            
             loadAdminData();
-            alert('Product saved successfully!');
+            alert('Product and pricing added successfully!');
         }
 
         function deleteProduct(index) {
@@ -655,13 +713,20 @@
             }
 
             db.products.forEach((p, idx) => {
+                let dealerPrice = p.exDealer || p.price || 0;
+                let mrpVal = p.mrp || 0;
+
                 container.innerHTML += `
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; padding: 0.5rem; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 4px;">
+                    <div class="product-card-ref">
                         <div>
-                            <strong>${p.name}</strong> (Price: LKR ${p.price} | Stock: <span id="stock-lbl-${idx}">${p.stock}</span>)
+                            <strong>${p.name}</strong><br>
+                            <small style="color: #047857;"><strong>Ex Dealer Price:</strong> LKR ${dealerPrice.toFixed(2)}</small> | 
+                            <small style="color: #b91c1c;"><strong>MRP:</strong> LKR ${mrpVal.toFixed(2)}</small><br>
+                            <small style="color: #4b5563;">Available Stock: <span id="stock-lbl-${idx}">${p.stock}</span></small>
                         </div>
                         <div>
-                            <input type="number" min="0" max="${p.stock}" value="0" id="order-qty-${idx}" oninput="calculateOrderTotal()" style="width: 80px; text-align: center;">
+                            <label style="font-size: 0.8rem; margin:0;">Order Qty:</label>
+                            <input type="number" min="0" max="${p.stock}" value="0" id="order-qty-${idx}" oninput="calculateOrderTotal()" style="width: 90px; text-align: center;">
                         </div>
                     </div>
                 `;
@@ -675,7 +740,7 @@
                 myOrdersTable.innerHTML = '<tr><td colspan="5" style="text-align:center;">You have not placed any orders yet.</td></tr>';
             } else {
                 myOrders.slice().reverse().forEach(o => {
-                    let itemsStr = o.items.map(i => `${i.name} (${i.qty})`).join(', ');
+                    let itemsStr = o.items.map(i => `${i.name} (Qty: ${i.qty})`).join(', ');
                     myOrdersTable.innerHTML += `
                         <tr>
                             <td>#${o.id}</td>
@@ -695,7 +760,8 @@
                 const qtyInput = document.getElementById(`order-qty-${idx}`);
                 if (qtyInput) {
                     let qty = parseInt(qtyInput.value) || 0;
-                    total += qty * p.price;
+                    let dealerPrice = p.exDealer || p.price || 0;
+                    total += qty * dealerPrice;
                 }
             });
             document.getElementById('order-calc-total').textContent = total.toFixed(2);
@@ -722,8 +788,14 @@
                             stockError = true;
                             return;
                         }
-                        orderedItems.push({ name: p.name, qty: qty, price: p.price });
-                        totalAmount += qty * p.price;
+                        let dealerPrice = p.exDealer || p.price || 0;
+                        orderedItems.push({ 
+                            name: p.name, 
+                            qty: qty, 
+                            dealerPrice: dealerPrice,
+                            mrp: p.mrp || 0
+                        });
+                        totalAmount += qty * dealerPrice;
                     }
                 }
             });
