@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAJ BROTHERS MARKETING - Distribution System</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #047857;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+            --danger: #dc2626;
+            --success: #059669;
+            --warning: #d97706;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        h2, h3 { color: var(--primary); margin-top: 0; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        button:hover { opacity: 0.9; }
+        .btn-danger { background-color: var(--danger); }
+        .btn-warning { background-color: var(--warning); color: white; }
+        .btn-success { background-color: var(--success); color: white; }
+
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: left;
+            white-space: nowrap;
+        }
+        th { background-color: #f8fafc; color: var(--primary); }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .hidden { display: none !important; }
+        .logout-btn {
+            background-color: var(--danger);
+            width: auto;
+            padding: 0.5rem 1rem;
+            float: right;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .stat-card.highlight {
+            border-left-color: var(--secondary);
+            background-color: #f0fdf4;
+        }
+        .stat-card h4 { margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.875rem; }
+        .stat-card p { margin: 0; font-size: 1.4rem; font-weight: bold; color: var(--primary); }
+        .tab-buttons { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .tab-btn {
+            background-color: #e5e7eb;
+            color: var(--text-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .tab-btn.active { background-color: var(--primary); color: white; }
+        .product-card-ref {
+            padding: 0.75rem;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .category-section-title {
+            background: var(--primary);
+            color: white;
+            padding: 0.6rem 1rem;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>RAJ BROTHERS MARKETING</h1>
+        <p>Stock, Sales & Representative Management System</p>
+    </header>
+
+    <div class="container">
+        <!-- LOGIN SECTION -->
+        <div id="login-section" class="card" style="max-width: 450px; margin: 2rem auto;">
+            <h2>PORTAL LOGIN</h2>
+            
+            <div class="tab-buttons">
+                <button class="tab-btn active" type="button" onclick="switchTab('login')">Login</button>
+                <button class="tab-btn" type="button" onclick="switchTab('register')">Register / Request</button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <div id="form-login">
+                <div class="form-group">
+                    <label>Role:</label>
+                    <select id="login-role">
+                        <option value="admin">Admin</option>
+                        <option value="ref">Sales Representative</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Username / ID:</label>
+                    <input type="text" id="login-user" value="admin" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" id="login-pass" value="admin123" placeholder="Enter password">
+                </div>
+                <button type="button" onclick="handleLogin()">Login to System</button>
+            </div>
+
+            <!-- REGISTRATION FORM -->
+            <div id="form-register" class="hidden">
+                <div class="form-group">
+                    <label>Register As:</label>
+                    <select id="reg-role" onchange="toggleRegFields()">
+                        <option value="admin">Admin</option>
+                        <option value="ref">Sales Representative</option>
+                    </select>
+                </div>
+                <div class="form-group hidden" id="group-fullname">
+                    <label>Full Name:</label>
+                    <input type="text" id="reg-fullname" placeholder="Enter full name">
+                </div>
+                <div class="form-group hidden" id="group-email">
+                    <label>Email Address:</label>
+                    <input type="email" id="reg-email" placeholder="e.g. rep@gmail.com">
+                </div>
+                <div class="form-group">
+                    <label>Username:</label>
+                    <input type="text" id="reg-user" placeholder="Choose username">
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" id="reg-pass" placeholder="Choose password">
+                </div>
+                <button type="button" onclick="handleRegister()">Register Account</button>
+            </div>
+        </div>
+
+        <!-- ADMIN DASHBOARD -->
+        <div id="admin-dashboard" class="hidden">
+            <div class="card">
+                <button class="logout-btn" type="button" onclick="logout()">Logout</button>
+                <h2 id="admin-welcome-title">Admin Control Panel</h2>
+                <p>Manage stock, prices, and view orders.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Total Available Stocks</h4>
+                    <p id="stat-total-stock">0 Units</p>
+                </div>
+                <div class="stat-card highlight">
+                    <h4>Total Stock Value</h4>
+                    <p id="stat-total-value">LKR 0.00</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Sales Reps Count</h4>
+                    <p id="stat-total-refs">0</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Orders</h4>
+                    <p id="stat-total-orders">0</p>
+                </div>
+            </div>
+
+            <!-- Manage Products -->
+            <div class="card">
+                <h3 id="form-section-title">Add / Update Product Stock</h3>
+                <input type="hidden" id="edit-product-index" value="-1">
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Category:</label>
+                        <select id="prod-category" onchange="updateProductNameDropdown()">
+                            <option value="Soda 250Ml">Soda 250Ml</option>
+                            <option value="Soda 500Ml">Soda 500Ml</option>
+                            <option value="Soda 750Ml">Soda 750Ml</option>
+                            <option value="Soda 1050Ml">Soda 1050Ml</option>
+                            <option value="Soda 1500Ml">Soda 1500Ml</option>
+                            <option value="Red Boost & Rastro">Red Boost & Rastro</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Product Name:</label>
+                        <select id="prod-name-select"></select>
+                        <input type="text" id="prod-name-custom" class="hidden" placeholder="Custom Product Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Price (LKR):</label>
+                        <input type="number" id="prod-price" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Available Stocks Qty:</label>
+                        <input type="number" id="prod-stock" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Ex Factory Price:</label>
+                        <input type="number" id="prod-ex-factory" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Ex Dealer Price:</label>
+                        <input type="number" id="prod-ex-dealer" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>MRP:</label>
+                        <input type="number" id="prod-mrp" placeholder="0.00">
+                    </div>
+                </div>
+
+                <button type="button" onclick="saveProduct()">Save Product Details</button>
+                <button id="cancel-edit-btn" class="btn-danger hidden" style="margin-top: 0.5rem;" type="button" onclick="resetProductForm()">Cancel Edit</button>
+
+                <h4 style="margin-top: 2rem;">Warehouse Inventory & Pricing</h4>
+                <div class="form-group">
+                    <input type="text" id="admin-search" placeholder="🔍 Search product..." oninput="loadAdminData()">
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Product Name</th>
+                                <th>Unit Price</th>
+                                <th>Stock</th>
+                                <th>Ex Factory</th>
+                                <th>Ex Dealer</th>
+                                <th>MRP</th>
+                                <th>Total Value</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-inventory-table"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Manage Reps -->
+            <div class="card">
+                <h3>Sales Representatives Management</h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <input type="text" id="ref-username" placeholder="e.g. ref1">
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="text" id="ref-password" placeholder="Password">
+                    </div>
+                </div>
+                <button type="button" onclick="saveRef()">Create Representative</button>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-refs-table"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Orders -->
+            <div class="card">
+                <h3>All Sales Orders</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Rep</th>
+                                <th>Shop</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-orders-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- REF DASHBOARD -->
+        <div id="ref-dashboard" class="hidden">
+            <div class="card">
+                <button class="logout-btn" type="button" onclick="logout()">Logout</button>
+                <h2 id="ref-welcome-title">Sales Portal</h2>
+            </div>
+            <div class="card">
+                <h3>Create New Order</h3>
+                <div class="form-group">
+                    <label>Shop Name:</label>
+                    <input type="text" id="order-shop" placeholder="Shop name">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="ref-search" placeholder="🔍 Search product..." oninput="loadRefData()">
+                </div>
+                <div id="ref-product-selection-list"></div>
+                <div style="margin-top: 1rem; font-weight: bold;">
+                    Total: LKR <span id="order-calc-total">0.00</span>
+                </div>
+                <button type="button" onclick="submitOrder()" style="margin-top: 1rem;">Submit Order</button>
+            </div>
+            <div class="card">
+                <h3>My Orders</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Shop</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ref-orders-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sodaFlavours = ["NEXTRA", "ORANGE", "CREAM SODA", "COLA", "LEMON", "GINGER"];
+        const energyDrinks = [
+            "RED BOOST GOLD 250 ML", "RED BOOST ORIGINAL 330 ML", "RED BOOST CLASSIC 330 ML",
+            "RED BOOST SUGAR FREE 330 ML", "RED BOOST BEAST 330 ML", "RASTRO ENERGIX BLUE 330 ML", "RASTRO ENERGIX RED 330 ML"
+        ];
+        const sodaSizes = ["Soda 250Ml", "Soda 500Ml", "Soda 750Ml", "Soda 1050Ml", "Soda 1500Ml"];
+
+        let initialProducts = [];
+        sodaSizes.forEach(size => {
+            sodaFlavours.forEach(flavour => {
+                initialProducts.push({
+                    category: size,
+                    name: `${flavour} (${size.replace('Soda ', '')})`,
+                    price: 0, stock: 10, exFactory: 0, exDealer: 0, mrp: 0
+                });
+            });
+        });
+        energyDrinks.forEach(drink => {
+            initialProducts.push({
+                category: "Red Boost & Rastro", name: drink, price: 0, stock: 10, exFactory: 0, exDealer: 0, mrp: 0
+            });
+        });
+
+        let db = JSON.parse(localStorage.getItem('raj_brothers_db_v22'));
+        if (!db || !db.products || db.products.length < 30) {
+            db = {
+                admins: [{ username: 'admin', password: 'admin123' }],
+                products: initialProducts,
+                refs: [],
+                orders: []
+            };
+            localStorage.setItem('raj_brothers_db_v22', JSON.stringify(db));
+        }
+
+        let currentUser = null;
+
+        function saveData() {
+            localStorage.setItem('raj_brothers_db_v22', JSON.stringify(db));
+        }
+
+        function toggleRegFields() {
+            const role = document.getElementById('reg-role').value;
+            document.getElementById('group-fullname').classList.toggle('hidden', role !== 'ref');
+            document.getElementById('group-email').classList.toggle('hidden', role !== 'ref');
+        }
+
+        function updateProductNameDropdown() {
+            const cat = document.getElementById('prod-category').value;
+            const selectElem = document.getElementById('prod-name-select');
+            const customInput = document.getElementById('prod-name-custom');
+            if(!selectElem) return;
+            selectElem.innerHTML = '';
+
+            if (cat.startsWith('Soda')) {
+                selectElem.classList.remove('hidden');
+                customInput.classList.add('hidden');
+                let sizeLabel = cat.replace('Soda ', '');
+                sodaFlavours.forEach(flv => {
+                    let optionText = `${flv} (${sizeLabel})`;
+                    selectElem.innerHTML += `<option value="${optionText}">${optionText}</option>`;
+                });
+            } else if (cat === 'Red Boost & Rastro') {
+                selectElem.classList.remove('hidden');
+                customInput.classList.add('hidden');
+                energyDrinks.forEach(drk => {
+                    selectElem.innerHTML += `<option value="${drk}">${drk}</option>`;
+                });
+            } else {
+                selectElem.classList.add('hidden');
+                customInput.classList.remove('hidden');
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn')[0].classList.toggle('active', tab === 'login');
+            document.querySelectorAll('.tab-btn')[1].classList.toggle('active', tab === 'register');
+            document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('form-register').classList.toggle('hidden', tab !== 'register');
+        }
+
+        function handleRegister() {
+            const role = document.getElementById('reg-role').value;
+            const username = document.getElementById('reg-user').value.trim();
+            const password = document.getElementById('reg-pass').value.trim();
+            if (!username || !password) { alert('Enter username & password'); return; }
+
+            if (role === 'admin') {
+                db.admins.push({ username, password });
+                saveData();
+                alert('Admin created successfully!');
+            } else {
+                db.refs.push({ username, password, approved: true });
+                saveData();
+                alert('Rep created successfully!');
+            }
+            switchTab('login');
+        }
+
+        function handleLogin() {
+            const role = document.getElementById('login-role').value;
+            const username = document.getElementById('login-user').value.trim();
+            const password = document.getElementById('login-pass').value.trim();
+
+            if (!username || !password) {
+                alert('Enter username and password');
+                return;
+            }
+
+            if (role === 'admin') {
+                let adminObj = db.admins.find(a => a.username.toLowerCase() === username.toLowerCase() && a.password === password);
+                if (!adminObj && username.toLowerCase() === 'admin' && password === 'admin123') {
+                    adminObj = { username: 'admin' };
+                }
+                if (adminObj) {
+                    currentUser = { role: 'admin', username: adminObj.username };
+                    document.getElementById('login-section').classList.add('hidden');
+                    document.getElementById('admin-dashboard').classList.remove('hidden');
+                    updateProductNameDropdown();
+                    loadAdminData();
+                } else {
+                    alert('Invalid Admin credentials!');
+                }
+            } else {
+                let refObj = db.refs.find(r => r.username.toLowerCase() === username.toLowerCase() && r.password === password);
+                if (refObj) {
+                    currentUser = { role: 'ref', username: refObj.username };
+                    document.getElementById('login-section').classList.add('hidden');
+                    document.getElementById('ref-dashboard').classList.remove('hidden');
+                    loadRefData();
+                } else {
+                    alert('Invalid Sales Representative credentials!');
+                }
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            document.getElementById('ref-dashboard').classList.add('hidden');
+            document.getElementById('login-section').classList.remove('hidden');
+        }
+
+        function loadAdminData() {
+            db = JSON.parse(localStorage.getItem('raj_brothers_db_v22')) || db;
+            let totalStockQty = (db.products || []).reduce((sum, p) => sum + parseInt(p.stock || 0), 0);
+            let totalStockVal = (db.products || []).reduce((sum, p) => sum + (parseInt(p.stock || 0) * parseFloat(p.exDealer || p.price || 0)), 0);
+
+            document.getElementById('stat-total-stock').textContent = `${totalStockQty} Units`;
+            document.getElementById('stat-total-value').textContent = `LKR ${totalStockVal.toFixed(2)}`;
+            document.getElementById('stat-total-refs').textContent = (db.refs || []).length;
+            document.getElementById('stat-total-orders').textContent = (db.orders || []).length;
+
+            const searchQuery = (document.getElementById('admin-search').value || '').toLowerCase();
+            const invTable = document.getElementById('admin-inventory-table');
+            invTable.innerHTML = '';
+
+            (db.products || []).forEach((p, idx) => {
+                if (p.name.toLowerCase().includes(searchQuery) || (p.category && p.category.toLowerCase().includes(searchQuery))) {
+                    let totalDealerVal = parseInt(p.stock || 0) * parseFloat(p.exDealer || p.price || 0);
+                    invTable.innerHTML += `
+                        <tr>
+                            <td>${p.category || ''}</td>
+                            <td><strong>${p.name}</strong></td>
+                            <td>LKR ${parseFloat(p.price || 0).toFixed(2)}</td>
+                            <td><strong>${p.stock}</strong></td>
+                            <td>LKR ${parseFloat(p.exFactory || 0).toFixed(2)}</td>
+                            <td>LKR ${parseFloat(p.exDealer || 0).toFixed(2)}</td>
+                            <td>LKR ${parseFloat(p.mrp || 0).toFixed(2)}</td>
+                            <td>LKR ${totalDealerVal.toFixed(2)}</td>
+                            <td>
+                                <button class="btn-warning" type="button" onclick="editProduct(${idx})">Edit</button>
+                                <button class="btn-danger" type="button" onclick="deleteProduct(${idx})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
+
+            const refsTable = document.getElementById('admin-refs-table');
+            refsTable.innerHTML = '';
+            (db.refs || []).forEach((r, idx) => {
+                refsTable.innerHTML += `<tr><td>${r.username}</td><td>Active</td><td><button class="btn-danger" type="button" onclick="deleteRef(${idx})">Delete</button></td></tr>`;
+            });
+
+            const ordersTable = document.getElementById('admin-orders-table');
+            ordersTable.innerHTML = '';
+            (db.orders || []).slice().reverse().forEach(o => {
+                let itemsStr = o.items.map(i => `${i.name} (Qty: ${i.qty})`).join(', ');
+                ordersTable.innerHTML += `<tr><td>#${o.id}</td><td>${o.ref}</td><td>${o.shop}</td><td>${itemsStr}</td><td>LKR ${parseFloat(o.total).toFixed(2)}</td><td>${o.date}</td></tr>`;
+            });
+        }
+
+        function saveProduct() {
+            const editIndex = parseInt(document.getElementById('edit-product-index').value);
+            const category = document.getElementById('prod-category').value;
+            let name = (category === 'Others') ? document.getElementById('prod-name-custom').value.trim() : document.getElementById('prod-name-select').value;
+            const price = parseFloat(document.getElementById('prod-price').value) || 0;
+            const stock = parseInt(document.getElementById('prod-stock').value) || 0;
+            const exFactory = parseFloat(document.getElementById('prod-ex-factory').value) || 0;
+            const exDealer = parseFloat(document.getElementById('prod-ex-dealer').value) || 0;
+            const mrp = parseFloat(document.getElementById('prod-mrp').value) || 0;
+
+            if (!name) { alert('Enter name'); return; }
+
+            if (editIndex > -1) {
+                db.products[editIndex] = { category, name, price, stock, exFactory, exDealer, mrp };
+            } else {
+                db.products.push({ category, name, price, stock, exFactory, exDealer, mrp });
+            }
+            saveData();
+            resetProductForm();
+            loadAdminData();
+            alert('Saved successfully!');
+        }
+
+        function editProduct(index) {
+            const p = db.products[index];
+            document.getElementById('prod-category').value = p.category || 'Others';
+            updateProductNameDropdown();
+            if (p.category === 'Others') {
+                document.getElementById('prod-name-custom').value = p.name;
+            } else {
+                document.getElementById('prod-name-select').value = p.name;
+            }
+            document.getElementById('prod-price').value = p.price;
+            document.getElementById('prod-stock').value = p.stock;
+            document.getElementById('prod-ex-factory').value = p.exFactory;
+            document.getElementById('prod-ex-dealer').value = p.exDealer;
+            document.getElementById('prod-mrp').value = p.mrp;
+            document.getElementById('edit-product-index').value = index;
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+        }
+
+        function resetProductForm() {
+            document.getElementById('edit-product-index').value = '-1';
+            document.getElementById('prod-stock').value = '';
+            document.getElementById('prod-price').value = '';
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+        }
+
+        function deleteProduct(index) {
+            db.products.splice(index, 1);
+            saveData();
+            loadAdminData();
+        }
+
+        function saveRef() {
+            const username = document.getElementById('ref-username').value.trim();
+            const password = document.getElementById('ref-password').value.trim();
+            if (!username || !password) return;
+            db.refs.push({ username, password, approved: true });
+            saveData();
+            loadAdminData();
+            alert('Rep created!');
+        }
+
+        function deleteRef(index) {
+            db.refs.splice(index, 1);
+            saveData();
+            loadAdminData();
+        }
+
+        function loadRefData() {
+            db = JSON.parse(localStorage.getItem('raj_brothers_db_v22')) || db;
+            const container = document.getElementById('ref-product-selection-list');
+            container.innerHTML = '';
+            const searchQuery = (document.getElementById('ref-search').value || '').toLowerCase();
+
+            const categories = ["Soda 250Ml", "Soda 500Ml", "Soda 750Ml", "Soda 1050Ml", "Soda 1500Ml", "Red Boost & Rastro", "Others"];
+            categories.forEach(cat => {
+                let catProducts = (db.products || []).map((p, idx) => ({ ...p, originalIndex: idx })).filter(p => (p.category || 'Others') === cat && p.name.toLowerCase().includes(searchQuery));
+                if (catProducts.length > 0) {
+                    container.innerHTML += `<div class="category-section-title">${cat}</div>`;
+                    catProducts.forEach(p => {
+                        container.innerHTML += `
+                            <div class="product-card-ref">
+                                <div>
+                                    <strong>${p.name}</strong><br>
+                                    <small>Ex Dealer: LKR ${p.exDealer || 0}</small> | <small>Stock: ${p.stock}</small>
+                                </div>
+                                <div>
+                                    <input type="number" min="0" max="${p.stock}" value="0" id="order-qty-${p.originalIndex}" oninput="calculateOrderTotal()" style="width: 80px; text-align: center;">
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            });
+            calculateOrderTotal();
+        }
+
+        function calculateOrderTotal() {
+            let total = 0;
+            (db.products || []).forEach((p, idx) => {
+                const qtyInput = document.getElementById(`order-qty-${idx}`);
+                if (qtyInput) {
+                    let qty = parseInt(qtyInput.value) || 0;
+                    total += qty * (p.exDealer || p.price || 0);
+                }
+            });
+            document.getElementById('order-calc-total').textContent = total.toFixed(2);
+        }
+
+        function submitOrder() {
+            const shop = document.getElementById('order-shop').value.trim();
+            if (!shop) { alert('Enter shop name'); return; }
+            let orderedItems = [], totalAmount = 0;
+
+            (db.products || []).forEach((p, idx) => {
+                const qtyInput = document.getElementById(`order-qty-${idx}`);
+                if (qtyInput) {
+                    let qty = parseInt(qtyInput.value) || 0;
+                    if (qty > 0) {
+                        if (qty > p.stock) { alert(`Stock low for ${p.name}`); return; }
+                        orderedItems.push({ name: p.name, qty: qty, dealerPrice: p.exDealer || p.price || 0 });
+                        totalAmount += qty * (p.exDealer || p.price || 0);
+                    }
+                }
+            });
+
+            if (orderedItems.length === 0) { alert('Select items'); return; }
+
+            orderedItems.forEach(item => {
+                let prod = db.products.find(p => p.name === item.name);
+                if (prod) prod.stock -= item.qty;
+            });
+
+            db.orders.push({
+                id: Date.now().toString().slice(-6),
+                ref: currentUser.username,
+                shop: shop,
+                items: orderedItems,
+                total: totalAmount,
+                date: new Date().toLocaleString()
+            });
+
+            saveData();
+            alert('Order submitted!');
+            loadRefData();
+        }
+    </script>
+</body>
+</html>
