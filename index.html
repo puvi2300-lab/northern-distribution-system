@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAJ BROTHERS MARKETING - Distribution System</title>
+    <title>RAJ BROTHERS MARKETING - Distribution Management System</title>
     <style>
         :root {
             --primary: #1e3a8a;
@@ -13,7 +13,6 @@
             --text-color: #1f2937;
             --border-color: #e5e7eb;
             --danger: #dc2626;
-            --success: #059669;
             --warning: #d97706;
         }
 
@@ -49,6 +48,7 @@
         h2, h3 { color: var(--primary); margin-top: 0; }
         .form-group { margin-bottom: 1rem; }
         label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        
         input, select {
             width: 100%;
             padding: 0.75rem;
@@ -73,7 +73,6 @@
         button:hover { opacity: 0.9; }
         .btn-danger { background-color: var(--danger); }
         .btn-warning { background-color: var(--warning); color: white; }
-        .btn-success { background-color: var(--success); color: white; }
 
         .table-responsive { width: 100%; overflow-x: auto; }
         table {
@@ -95,18 +94,21 @@
             gap: 1rem;
         }
         .hidden { display: none !important; }
+        
         .logout-btn {
             background-color: var(--danger);
             width: auto;
             padding: 0.5rem 1rem;
             float: right;
         }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
+        
         .stat-card {
             background: white;
             padding: 1rem;
@@ -120,6 +122,7 @@
         }
         .stat-card h4 { margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.875rem; }
         .stat-card p { margin: 0; font-size: 1.4rem; font-weight: bold; color: var(--primary); }
+
         .tab-buttons { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
         .tab-btn {
             background-color: #e5e7eb;
@@ -131,6 +134,7 @@
             font-weight: 600;
         }
         .tab-btn.active { background-color: var(--primary); color: white; }
+
         .product-card-ref {
             padding: 0.75rem;
             background: #f8fafc;
@@ -164,8 +168,8 @@
             <h2>PORTAL LOGIN</h2>
             
             <div class="tab-buttons">
-                <button class="tab-btn active" type="button" onclick="switchTab('login')">Login</button>
-                <button class="tab-btn" type="button" onclick="switchTab('register')">Register / Request</button>
+                <button class="tab-btn active" id="tab-login-btn" onclick="switchTab('login')">Login</button>
+                <button class="tab-btn" id="tab-reg-btn" onclick="switchTab('register')">Register ID</button>
             </div>
 
             <!-- LOGIN FORM -->
@@ -192,18 +196,10 @@
             <div id="form-register" class="hidden">
                 <div class="form-group">
                     <label>Register As:</label>
-                    <select id="reg-role" onchange="toggleRegFields()">
+                    <select id="reg-role">
                         <option value="admin">Admin</option>
                         <option value="ref">Sales Representative</option>
                     </select>
-                </div>
-                <div class="form-group hidden" id="group-fullname">
-                    <label>Full Name:</label>
-                    <input type="text" id="reg-fullname" placeholder="Enter full name">
-                </div>
-                <div class="form-group hidden" id="group-email">
-                    <label>Email Address:</label>
-                    <input type="email" id="reg-email" placeholder="e.g. rep@gmail.com">
                 </div>
                 <div class="form-group">
                     <label>Username:</label>
@@ -213,7 +209,7 @@
                     <label>Password:</label>
                     <input type="password" id="reg-pass" placeholder="Choose password">
                 </div>
-                <button type="button" onclick="handleRegister()">Register Account</button>
+                <button type="button" onclick="handleRegister()">Create Account</button>
             </div>
         </div>
 
@@ -371,7 +367,7 @@
         <div id="ref-dashboard" class="hidden">
             <div class="card">
                 <button class="logout-btn" type="button" onclick="logout()">Logout</button>
-                <h2 id="ref-welcome-title">Sales Portal</h2>
+                <h2 id="ref-welcome-title">Sales Representative Portal</h2>
             </div>
             <div class="card">
                 <h3>Create New Order</h3>
@@ -432,27 +428,28 @@
             });
         });
 
-        let db = JSON.parse(localStorage.getItem('raj_brothers_db_v22'));
-        if (!db || !db.products || db.products.length < 30) {
+        // Unique local key v23 to bypass stuck state
+        let db;
+        try {
+            db = JSON.parse(localStorage.getItem('raj_brothers_db_v23'));
+        } catch(e) {
+            db = null;
+        }
+
+        if (!db || !db.products) {
             db = {
                 admins: [{ username: 'admin', password: 'admin123' }],
                 products: initialProducts,
                 refs: [],
                 orders: []
             };
-            localStorage.setItem('raj_brothers_db_v22', JSON.stringify(db));
+            localStorage.setItem('raj_brothers_db_v23', JSON.stringify(db));
         }
 
         let currentUser = null;
 
         function saveData() {
-            localStorage.setItem('raj_brothers_db_v22', JSON.stringify(db));
-        }
-
-        function toggleRegFields() {
-            const role = document.getElementById('reg-role').value;
-            document.getElementById('group-fullname').classList.toggle('hidden', role !== 'ref');
-            document.getElementById('group-email').classList.toggle('hidden', role !== 'ref');
+            localStorage.setItem('raj_brothers_db_v23', JSON.stringify(db));
         }
 
         function updateProductNameDropdown() {
@@ -483,8 +480,8 @@
         }
 
         function switchTab(tab) {
-            document.querySelectorAll('.tab-btn')[0].classList.toggle('active', tab === 'login');
-            document.querySelectorAll('.tab-btn')[1].classList.toggle('active', tab === 'register');
+            document.getElementById('tab-login-btn').classList.toggle('active', tab === 'login');
+            document.getElementById('tab-reg-btn').classList.toggle('active', tab === 'register');
             document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
             document.getElementById('form-register').classList.toggle('hidden', tab !== 'register');
         }
@@ -500,7 +497,7 @@
                 saveData();
                 alert('Admin created successfully!');
             } else {
-                db.refs.push({ username, password, approved: true });
+                db.refs.push({ username, password });
                 saveData();
                 alert('Rep created successfully!');
             }
@@ -508,247 +505,4 @@
         }
 
         function handleLogin() {
-            const role = document.getElementById('login-role').value;
-            const username = document.getElementById('login-user').value.trim();
-            const password = document.getElementById('login-pass').value.trim();
-
-            if (!username || !password) {
-                alert('Enter username and password');
-                return;
-            }
-
-            if (role === 'admin') {
-                let adminObj = db.admins.find(a => a.username.toLowerCase() === username.toLowerCase() && a.password === password);
-                if (!adminObj && username.toLowerCase() === 'admin' && password === 'admin123') {
-                    adminObj = { username: 'admin' };
-                }
-                if (adminObj) {
-                    currentUser = { role: 'admin', username: adminObj.username };
-                    document.getElementById('login-section').classList.add('hidden');
-                    document.getElementById('admin-dashboard').classList.remove('hidden');
-                    updateProductNameDropdown();
-                    loadAdminData();
-                } else {
-                    alert('Invalid Admin credentials!');
-                }
-            } else {
-                let refObj = db.refs.find(r => r.username.toLowerCase() === username.toLowerCase() && r.password === password);
-                if (refObj) {
-                    currentUser = { role: 'ref', username: refObj.username };
-                    document.getElementById('login-section').classList.add('hidden');
-                    document.getElementById('ref-dashboard').classList.remove('hidden');
-                    loadRefData();
-                } else {
-                    alert('Invalid Sales Representative credentials!');
-                }
-            }
-        }
-
-        function logout() {
-            currentUser = null;
-            document.getElementById('admin-dashboard').classList.add('hidden');
-            document.getElementById('ref-dashboard').classList.add('hidden');
-            document.getElementById('login-section').classList.remove('hidden');
-        }
-
-        function loadAdminData() {
-            db = JSON.parse(localStorage.getItem('raj_brothers_db_v22')) || db;
-            let totalStockQty = (db.products || []).reduce((sum, p) => sum + parseInt(p.stock || 0), 0);
-            let totalStockVal = (db.products || []).reduce((sum, p) => sum + (parseInt(p.stock || 0) * parseFloat(p.exDealer || p.price || 0)), 0);
-
-            document.getElementById('stat-total-stock').textContent = `${totalStockQty} Units`;
-            document.getElementById('stat-total-value').textContent = `LKR ${totalStockVal.toFixed(2)}`;
-            document.getElementById('stat-total-refs').textContent = (db.refs || []).length;
-            document.getElementById('stat-total-orders').textContent = (db.orders || []).length;
-
-            const searchQuery = (document.getElementById('admin-search').value || '').toLowerCase();
-            const invTable = document.getElementById('admin-inventory-table');
-            invTable.innerHTML = '';
-
-            (db.products || []).forEach((p, idx) => {
-                if (p.name.toLowerCase().includes(searchQuery) || (p.category && p.category.toLowerCase().includes(searchQuery))) {
-                    let totalDealerVal = parseInt(p.stock || 0) * parseFloat(p.exDealer || p.price || 0);
-                    invTable.innerHTML += `
-                        <tr>
-                            <td>${p.category || ''}</td>
-                            <td><strong>${p.name}</strong></td>
-                            <td>LKR ${parseFloat(p.price || 0).toFixed(2)}</td>
-                            <td><strong>${p.stock}</strong></td>
-                            <td>LKR ${parseFloat(p.exFactory || 0).toFixed(2)}</td>
-                            <td>LKR ${parseFloat(p.exDealer || 0).toFixed(2)}</td>
-                            <td>LKR ${parseFloat(p.mrp || 0).toFixed(2)}</td>
-                            <td>LKR ${totalDealerVal.toFixed(2)}</td>
-                            <td>
-                                <button class="btn-warning" type="button" onclick="editProduct(${idx})">Edit</button>
-                                <button class="btn-danger" type="button" onclick="deleteProduct(${idx})">Delete</button>
-                            </td>
-                        </tr>
-                    `;
-                }
-            });
-
-            const refsTable = document.getElementById('admin-refs-table');
-            refsTable.innerHTML = '';
-            (db.refs || []).forEach((r, idx) => {
-                refsTable.innerHTML += `<tr><td>${r.username}</td><td>Active</td><td><button class="btn-danger" type="button" onclick="deleteRef(${idx})">Delete</button></td></tr>`;
-            });
-
-            const ordersTable = document.getElementById('admin-orders-table');
-            ordersTable.innerHTML = '';
-            (db.orders || []).slice().reverse().forEach(o => {
-                let itemsStr = o.items.map(i => `${i.name} (Qty: ${i.qty})`).join(', ');
-                ordersTable.innerHTML += `<tr><td>#${o.id}</td><td>${o.ref}</td><td>${o.shop}</td><td>${itemsStr}</td><td>LKR ${parseFloat(o.total).toFixed(2)}</td><td>${o.date}</td></tr>`;
-            });
-        }
-
-        function saveProduct() {
-            const editIndex = parseInt(document.getElementById('edit-product-index').value);
-            const category = document.getElementById('prod-category').value;
-            let name = (category === 'Others') ? document.getElementById('prod-name-custom').value.trim() : document.getElementById('prod-name-select').value;
-            const price = parseFloat(document.getElementById('prod-price').value) || 0;
-            const stock = parseInt(document.getElementById('prod-stock').value) || 0;
-            const exFactory = parseFloat(document.getElementById('prod-ex-factory').value) || 0;
-            const exDealer = parseFloat(document.getElementById('prod-ex-dealer').value) || 0;
-            const mrp = parseFloat(document.getElementById('prod-mrp').value) || 0;
-
-            if (!name) { alert('Enter name'); return; }
-
-            if (editIndex > -1) {
-                db.products[editIndex] = { category, name, price, stock, exFactory, exDealer, mrp };
-            } else {
-                db.products.push({ category, name, price, stock, exFactory, exDealer, mrp });
-            }
-            saveData();
-            resetProductForm();
-            loadAdminData();
-            alert('Saved successfully!');
-        }
-
-        function editProduct(index) {
-            const p = db.products[index];
-            document.getElementById('prod-category').value = p.category || 'Others';
-            updateProductNameDropdown();
-            if (p.category === 'Others') {
-                document.getElementById('prod-name-custom').value = p.name;
-            } else {
-                document.getElementById('prod-name-select').value = p.name;
-            }
-            document.getElementById('prod-price').value = p.price;
-            document.getElementById('prod-stock').value = p.stock;
-            document.getElementById('prod-ex-factory').value = p.exFactory;
-            document.getElementById('prod-ex-dealer').value = p.exDealer;
-            document.getElementById('prod-mrp').value = p.mrp;
-            document.getElementById('edit-product-index').value = index;
-            document.getElementById('cancel-edit-btn').classList.remove('hidden');
-        }
-
-        function resetProductForm() {
-            document.getElementById('edit-product-index').value = '-1';
-            document.getElementById('prod-stock').value = '';
-            document.getElementById('prod-price').value = '';
-            document.getElementById('cancel-edit-btn').classList.add('hidden');
-        }
-
-        function deleteProduct(index) {
-            db.products.splice(index, 1);
-            saveData();
-            loadAdminData();
-        }
-
-        function saveRef() {
-            const username = document.getElementById('ref-username').value.trim();
-            const password = document.getElementById('ref-password').value.trim();
-            if (!username || !password) return;
-            db.refs.push({ username, password, approved: true });
-            saveData();
-            loadAdminData();
-            alert('Rep created!');
-        }
-
-        function deleteRef(index) {
-            db.refs.splice(index, 1);
-            saveData();
-            loadAdminData();
-        }
-
-        function loadRefData() {
-            db = JSON.parse(localStorage.getItem('raj_brothers_db_v22')) || db;
-            const container = document.getElementById('ref-product-selection-list');
-            container.innerHTML = '';
-            const searchQuery = (document.getElementById('ref-search').value || '').toLowerCase();
-
-            const categories = ["Soda 250Ml", "Soda 500Ml", "Soda 750Ml", "Soda 1050Ml", "Soda 1500Ml", "Red Boost & Rastro", "Others"];
-            categories.forEach(cat => {
-                let catProducts = (db.products || []).map((p, idx) => ({ ...p, originalIndex: idx })).filter(p => (p.category || 'Others') === cat && p.name.toLowerCase().includes(searchQuery));
-                if (catProducts.length > 0) {
-                    container.innerHTML += `<div class="category-section-title">${cat}</div>`;
-                    catProducts.forEach(p => {
-                        container.innerHTML += `
-                            <div class="product-card-ref">
-                                <div>
-                                    <strong>${p.name}</strong><br>
-                                    <small>Ex Dealer: LKR ${p.exDealer || 0}</small> | <small>Stock: ${p.stock}</small>
-                                </div>
-                                <div>
-                                    <input type="number" min="0" max="${p.stock}" value="0" id="order-qty-${p.originalIndex}" oninput="calculateOrderTotal()" style="width: 80px; text-align: center;">
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-            });
-            calculateOrderTotal();
-        }
-
-        function calculateOrderTotal() {
-            let total = 0;
-            (db.products || []).forEach((p, idx) => {
-                const qtyInput = document.getElementById(`order-qty-${idx}`);
-                if (qtyInput) {
-                    let qty = parseInt(qtyInput.value) || 0;
-                    total += qty * (p.exDealer || p.price || 0);
-                }
-            });
-            document.getElementById('order-calc-total').textContent = total.toFixed(2);
-        }
-
-        function submitOrder() {
-            const shop = document.getElementById('order-shop').value.trim();
-            if (!shop) { alert('Enter shop name'); return; }
-            let orderedItems = [], totalAmount = 0;
-
-            (db.products || []).forEach((p, idx) => {
-                const qtyInput = document.getElementById(`order-qty-${idx}`);
-                if (qtyInput) {
-                    let qty = parseInt(qtyInput.value) || 0;
-                    if (qty > 0) {
-                        if (qty > p.stock) { alert(`Stock low for ${p.name}`); return; }
-                        orderedItems.push({ name: p.name, qty: qty, dealerPrice: p.exDealer || p.price || 0 });
-                        totalAmount += qty * (p.exDealer || p.price || 0);
-                    }
-                }
-            });
-
-            if (orderedItems.length === 0) { alert('Select items'); return; }
-
-            orderedItems.forEach(item => {
-                let prod = db.products.find(p => p.name === item.name);
-                if (prod) prod.stock -= item.qty;
-            });
-
-            db.orders.push({
-                id: Date.now().toString().slice(-6),
-                ref: currentUser.username,
-                shop: shop,
-                items: orderedItems,
-                total: totalAmount,
-                date: new Date().toLocaleString()
-            });
-
-            saveData();
-            alert('Order submitted!');
-            loadRefData();
-        }
-    </script>
-</body>
-</html>
+            const role = document.getElementById('
