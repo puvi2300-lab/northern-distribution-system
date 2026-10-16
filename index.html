@@ -92,13 +92,21 @@
             background-color: var(--danger);
         }
 
+        .btn-warning {
+            background-color: #d97706;
+            color: white;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
             background: white;
-            overflow-x: auto;
-            display: block;
         }
 
         th, td {
@@ -199,13 +207,20 @@
             align-items: center;
         }
 
-        .category-title {
-            background: #e2e8f0;
-            color: var(--primary);
-            padding: 0.5rem 1rem;
+        .category-section-title {
+            background: var(--primary);
+            color: white;
+            padding: 0.6rem 1rem;
             font-weight: bold;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
             border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-box {
+            margin-bottom: 1rem;
         }
 
         @media (max-width: 768px) {
@@ -281,7 +296,7 @@
             <div class="card">
                 <button class="logout-btn" onclick="logout()">Logout</button>
                 <h2 id="admin-welcome-title">RAJ BROTHERS MARKETING - Admin Control Panel</h2>
-                <p>Manage your categorized inventory, pricing, reps, and monitor sales performance.</p>
+                <p>Manage categorized stock, correct prices/quantities, reps, and monitor sales performance.</p>
             </div>
 
             <!-- SUMMARY STATS WITH STOCK VALUE -->
@@ -306,7 +321,8 @@
 
             <!-- Manage Products & Inventory -->
             <div class="card">
-                <h3>Manage Products & Warehouse Stock</h3>
+                <h3 id="form-section-title">Add New Product / Stock Correction</h3>
+                <input type="hidden" id="edit-product-index" value="-1">
                 
                 <div class="grid-2">
                     <div class="form-group">
@@ -317,13 +333,13 @@
                             <option value="Soda 750Ml">Soda 750Ml</option>
                             <option value="Soda 1050Ml">Soda 1050Ml</option>
                             <option value="Soda 1500Ml">Soda 1500Ml</option>
-                            <option value="Red Boost & Rastro">Red Boost & Rastro Energix</option>
+                            <option value="Red Boost & Rastro">🥤 Red Boost & Rastro Energix</option>
                             <option value="Others">Others</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Product Name:</label>
-                        <input type="text" id="prod-name" placeholder="e.g., Red Boost Gold 250 ML">
+                        <input type="text" id="prod-name" placeholder="e.g., NEXTRA, ORANGE">
                     </div>
                     <div class="form-group">
                         <label>Unit Price (LKR):</label>
@@ -347,25 +363,33 @@
                     </div>
                 </div>
 
-                <button onclick="saveProduct()">Add / Update Product</button>
+                <button id="save-prod-btn" onclick="saveProduct()">Add Product</button>
+                <button id="cancel-edit-btn" class="btn-danger hidden" style="margin-top: 0.5rem;" onclick="resetProductForm()">Cancel Edit</button>
 
-                <h4 style="margin-top: 1.5rem;">Current Warehouse Inventory & Pricing</h4>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Product Name</th>
-                            <th>Unit Price</th>
-                            <th>Available Stocks</th>
-                            <th>Ex Factory Price</th>
-                            <th>Ex Dealer Price</th>
-                            <th>MRP</th>
-                            <th>Total Dealer Value</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-inventory-table"></tbody>
-                </table>
+                <h4 style="margin-top: 2rem;">Current Warehouse Inventory & Pricing</h4>
+                
+                <div class="search-box">
+                    <input type="text" id="admin-search" placeholder="🔍 Search products by name or category..." oninput="loadAdminData()">
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Product Name</th>
+                                <th>Unit Price</th>
+                                <th>Available Stocks</th>
+                                <th>Ex Factory Price</th>
+                                <th>Ex Dealer Price</th>
+                                <th>MRP</th>
+                                <th>Total Dealer Value</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-inventory-table"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Manage Sales Reps -->
@@ -384,34 +408,38 @@
                 <button onclick="saveRef()">Create / Update Representative</button>
 
                 <h4 style="margin-top: 1.5rem;">Active Representatives List</h4>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Representative ID</th>
-                            <th>Password</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-refs-table"></tbody>
-                </table>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Representative ID</th>
+                                <th>Password</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-refs-table"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- All Orders History -->
             <div class="card">
                 <h3>All Sales Orders & Rep Performance</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Representative</th>
-                            <th>Shop / Customer</th>
-                            <th>Items & Details</th>
-                            <th>Total Amount (LKR)</th>
-                            <th>Date / Time</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-orders-table"></tbody>
-                </table>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Representative</th>
+                                <th>Shop / Customer</th>
+                                <th>Items & Details</th>
+                                <th>Total Amount (LKR)</th>
+                                <th>Date / Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-orders-table"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -429,8 +457,12 @@
                     <label>Shop / Customer Name:</label>
                     <input type="text" id="order-shop" placeholder="Enter shop name">
                 </div>
+
+                <div class="search-box">
+                    <input type="text" id="ref-search" placeholder="🔍 Search products for ordering..." oninput="loadRefData()">
+                </div>
                 
-                <h4>Select Products & Quantities by Category</h4>
+                <h4 style="margin-top: 1rem;">Select Products & Quantities by Category</h4>
                 <div id="ref-product-selection-list">
                     <!-- Dynamic categorized product selection list -->
                 </div>
@@ -443,45 +475,85 @@
 
             <div class="card">
                 <h3>My Order History</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Shop Name</th>
-                            <th>Items Sold</th>
-                            <th>Total (LKR)</th>
-                            <th>Date / Time</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ref-orders-table"></tbody>
-                </table>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Shop Name</th>
+                                <th>Items Sold</th>
+                                <th>Total (LKR)</th>
+                                <th>Date / Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ref-orders-table"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Default predefined products if storage is empty
-        const defaultProducts = [
-            { category: "Red Boost & Rastro", name: "RED BOOST GOLD 250 ML", price: 0, stock: 100, exFactory: 0, exDealer: 0, mrp: 0 },
-            { category: "Red Boost & Rastro", name: "RED BOOST ORIGINAL 330 ML", price: 0, stock: 100, exFactory: 0, exDealer: 0, mrp: 0 },
-            { category: "Red Boost & Rastro", name: "RED BOOST CLASSIC 330 ML", price: 0, stock: 100, exFactory: 0, exDealer: 0, mrp: 0 },
-            { category: "Red Boost & Rastro", name: "RED BOOST SUGAR FREE 330 ML", price: 0, stock: 100, exFactory: 0, exDealer: 0, mrp: 0 },
-            { category: "Red Boost & Rastro", name: "RED BOOST BEAST 330 ML", price: 0, stock: 100, exFactory: 0, exDealer: 0, mrp: 0 },
-            { category: "Red Boost & Rastro", name: "RASTRO ENERGIX BLUE 330 ML", price: 0, stock: 100, exFactory: 0, exDealer: 0, mrp: 0 },
-            { category: "Red Boost & Rastro", name: "RASTRO ENERGIX RED 330 ML", price: 0, stock: 100, exFactory: 0, exDealer: 0, mrp: 0 }
+        // Default predefined products (Soda flavours for each size & Energy drinks)
+        const defaultFlavours = ["NEXTRA", "ORANGE", "CREAM SODA", "COLA", "LEMON", "GINGER"];
+        const sodaSizes = ["Soda 250Ml", "Soda 500Ml", "Soda 750Ml", "Soda 1050Ml", "Soda 1500Ml"];
+        
+        let initialProducts = [];
+
+        // Generate Soda Flavours automatically
+        sodaSizes.forEach(size => {
+            defaultFlavours.forEach(flavour => {
+                initialProducts.push({
+                    category: size,
+                    name: `${flavour} (${size.replace('Soda ', '')})`,
+                    price: 0,
+                    stock: 50,
+                    exFactory: 0,
+                    exDealer: 0,
+                    mrp: 0
+                });
+            });
+        });
+
+        // Add Red Boost & Rastro Energix items
+        const energyDrinks = [
+            "RED BOOST GOLD 250 ML",
+            "RED BOOST ORIGINAL 330 ML",
+            "RED BOOST CLASSIC 330 ML",
+            "RED BOOST SUGAR FREE 330 ML",
+            "RED BOOST BEAST 330 ML",
+            "RASTRO ENERGIX BLUE 330 ML",
+            "RASTRO ENERGIX RED 330 ML"
         ];
 
-        let db = JSON.parse(localStorage.getItem('raj_brothers_db_v12')) || {
-            admins: [],   
-            products: defaultProducts, 
-            refs: [],     
-            orders: []    
-        };
+        energyDrinks.forEach(drink => {
+            initialProducts.push({
+                category: "Red Boost & Rastro",
+                name: drink,
+                price: 0,
+                stock: 50,
+                exFactory: 0,
+                exDealer: 0,
+                mrp: 0
+            });
+        });
+
+        let db = JSON.parse(localStorage.getItem('raj_brothers_db_v14'));
+
+        if (!db || !db.products || db.products.length === 0) {
+            db = {
+                admins: [],
+                products: initialProducts,
+                refs: [],
+                orders: []
+            };
+            localStorage.setItem('raj_brothers_db_v14', JSON.stringify(db));
+        }
 
         let currentUser = null;
 
         function saveData() {
-            localStorage.setItem('raj_brothers_db_v12', JSON.stringify(db));
+            localStorage.setItem('raj_brothers_db_v14', JSON.stringify(db));
         }
 
         function switchTab(tab) {
@@ -516,19 +588,19 @@
             if (role === 'admin') {
                 const existing = db.admins.find(a => a.username === username);
                 if (existing) {
-                    alert('Admin username already exists! Choose another.');
+                    alert('Admin username already exists!');
                     return;
                 }
                 db.admins.push({ username, password });
-                alert('Admin account created successfully! You can now log in.');
+                alert('Admin account created successfully!');
             } else {
                 const existing = db.refs.find(r => r.username === username);
                 if (existing) {
-                    alert('Representative username already exists! Choose another.');
+                    alert('Representative username already exists!');
                     return;
                 }
                 db.refs.push({ username, password });
-                alert('Sales Representative account created successfully! You can now log in.');
+                alert('Sales Representative account created successfully!');
             }
 
             saveData();
@@ -557,10 +629,10 @@
                     currentUser = { role: 'admin', username: username };
                     document.getElementById('login-section').classList.add('hidden');
                     document.getElementById('admin-dashboard').classList.remove('hidden');
-                    document.getElementById('admin-welcome-title').textContent = `RAJ BROTHERS MARKETING - Admin Control Panel (${username})`;
+                    document.getElementById('admin-welcome-title').textContent = `RAJ BROTHERS MARKETING - Admin Panel (${username})`;
                     loadAdminData();
                 } else {
-                    alert('Invalid Admin username or password!');
+                    alert('Invalid Admin credentials!');
                 }
             } else {
                 const refObj = db.refs.find(r => r.username === username && r.password === password);
@@ -571,7 +643,7 @@
                     document.getElementById('ref-welcome-title').textContent = `RAJ BROTHERS MARKETING - Sales Portal (${username})`;
                     loadRefData();
                 } else {
-                    alert('Invalid Representative username or password!');
+                    alert('Invalid Representative credentials!');
                 }
             }
         }
@@ -586,7 +658,6 @@
             switchTab('login');
         }
 
-        // --- ADMIN FUNCTIONS ---
         function loadAdminData() {
             let totalStockQty = db.products.reduce((sum, p) => sum + parseInt(p.stock || 0), 0);
             let totalStockVal = db.products.reduce((sum, p) => sum + (parseInt(p.stock || 0) * parseFloat(p.exDealer || p.price || 0)), 0);
@@ -596,14 +667,19 @@
             document.getElementById('stat-total-refs').textContent = db.refs.length;
             document.getElementById('stat-total-orders').textContent = db.orders.length;
 
-            // Inventory Table
+            const searchQuery = document.getElementById('admin-search').value.toLowerCase();
             const invTable = document.getElementById('admin-inventory-table');
             invTable.innerHTML = '';
-            if (db.products.length === 0) {
-                invTable.innerHTML = '<tr><td colspan="9" style="text-align:center;">No products added yet. Fill the details above to add items.</td></tr>';
+
+            const filteredProducts = db.products.map((p, idx) => ({ ...p, originalIndex: idx })).filter(p => 
+                p.name.toLowerCase().includes(searchQuery) || (p.category && p.category.toLowerCase().includes(searchQuery))
+            );
+
+            if (filteredProducts.length === 0) {
+                invTable.innerHTML = '<tr><td colspan="9" style="text-align:center;">No matching products found.</td></tr>';
             } else {
-                db.products.forEach((p, index) => {
-                    let totalDealerVal = p.stock * (p.exDealer || p.price || 0);
+                filteredProducts.forEach(p => {
+                    let totalDealerVal = (parseInt(p.stock || 0)) * parseFloat(p.exDealer || p.price || 0);
                     invTable.innerHTML += `
                         <tr>
                             <td><span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem;">${p.category || 'General'}</span></td>
@@ -614,17 +690,19 @@
                             <td>LKR ${parseFloat(p.exDealer || 0).toFixed(2)}</td>
                             <td>LKR ${parseFloat(p.mrp || 0).toFixed(2)}</td>
                             <td>LKR ${totalDealerVal.toFixed(2)}</td>
-                            <td><button class="btn-danger" style="padding:0.25rem 0.5rem; width:auto;" onclick="deleteProduct(${index})">Delete</button></td>
+                            <td>
+                                <button class="btn-warning" style="padding:0.25rem 0.5rem; width:auto; margin-bottom:2px;" onclick="editProduct(${p.originalIndex})">Edit</button>
+                                <button class="btn-danger" style="padding:0.25rem 0.5rem; width:auto;" onclick="deleteProduct(${p.originalIndex})">Delete</button>
+                            </td>
                         </tr>
                     `;
                 });
             }
 
-            // Refs Table
             const refsTable = document.getElementById('admin-refs-table');
             refsTable.innerHTML = '';
             if (db.refs.length === 0) {
-                refsTable.innerHTML = '<tr><td colspan="3" style="text-align:center;">No representatives configured yet.</td></tr>';
+                refsTable.innerHTML = '<tr><td colspan="3" style="text-align:center;">No representatives added yet.</td></tr>';
             } else {
                 db.refs.forEach((r, index) => {
                     refsTable.innerHTML += `
@@ -637,14 +715,13 @@
                 });
             }
 
-            // Orders Table
             const ordersTable = document.getElementById('admin-orders-table');
             ordersTable.innerHTML = '';
             if (db.orders.length === 0) {
                 ordersTable.innerHTML = '<tr><td colspan="6" style="text-align:center;">No orders recorded yet.</td></tr>';
             } else {
                 db.orders.slice().reverse().forEach(o => {
-                    let itemsStr = o.items.map(i => `${i.name} (Qty: ${i.qty} @ LKR ${i.dealerPrice})`).join(', ');
+                    let itemsStr = o.items.map(i => `${i.name} (Qty: ${i.qty})`).join(', ');
                     ordersTable.innerHTML += `
                         <tr>
                             <td>#${o.id}</td>
@@ -660,6 +737,7 @@
         }
 
         function saveProduct() {
+            const editIndex = parseInt(document.getElementById('edit-product-index').value);
             const category = document.getElementById('prod-category').value;
             const name = document.getElementById('prod-name').value.trim();
             const price = parseFloat(document.getElementById('prod-price').value) || 0;
@@ -673,28 +751,62 @@
                 return;
             }
 
-            const existing = db.products.find(p => p.name.toLowerCase() === name.toLowerCase());
-            if (existing) {
-                existing.category = category;
-                existing.price = price;
-                existing.stock += stock;
-                existing.exFactory = exFactory;
-                existing.exDealer = exDealer;
-                existing.mrp = mrp;
+            if (editIndex > -1) {
+                // Update existing product
+                db.products[editIndex] = { category, name, price, stock, exFactory, exDealer, mrp };
+                alert('Product updated successfully!');
             } else {
-                db.products.push({ category, name, price, stock, exFactory, exDealer, mrp });
+                // Add new product
+                const existing = db.products.find(p => p.name.toLowerCase() === name.toLowerCase());
+                if (existing) {
+                    existing.category = category;
+                    existing.price = price;
+                    existing.stock += stock;
+                    existing.exFactory = exFactory;
+                    existing.exDealer = exDealer;
+                    existing.mrp = mrp;
+                    alert('Product already exists. Stock and prices updated!');
+                } else {
+                    db.products.push({ category, name, price, stock, exFactory, exDealer, mrp });
+                    alert('New product added successfully!');
+                }
             }
 
             saveData();
+            resetProductForm();
+            loadAdminData();
+        }
+
+        function editProduct(index) {
+            const p = db.products[index];
+            document.getElementById('prod-category').value = p.category || 'Others';
+            document.getElementById('prod-name').value = p.name;
+            document.getElementById('prod-price').value = p.price;
+            document.getElementById('prod-stock').value = p.stock;
+            document.getElementById('prod-ex-factory').value = p.exFactory;
+            document.getElementById('prod-ex-dealer').value = p.exDealer;
+            document.getElementById('prod-mrp').value = p.mrp;
+            document.getElementById('edit-product-index').value = index;
+
+            document.getElementById('form-section-title').textContent = 'Edit Product & Stock Correction';
+            document.getElementById('save-prod-btn').textContent = 'Update Product Details';
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetProductForm() {
+            document.getElementById('prod-category').value = 'Soda 250Ml';
             document.getElementById('prod-name').value = '';
             document.getElementById('prod-price').value = '';
             document.getElementById('prod-stock').value = '';
             document.getElementById('prod-ex-factory').value = '';
             document.getElementById('prod-ex-dealer').value = '';
             document.getElementById('prod-mrp').value = '';
-            
-            loadAdminData();
-            alert('Product and pricing added successfully!');
+            document.getElementById('edit-product-index').value = '-1';
+
+            document.getElementById('form-section-title').textContent = 'Add New Product / Stock Correction';
+            document.getElementById('save-prod-btn').textContent = 'Add Product';
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
         }
 
         function deleteProduct(index) {
@@ -725,7 +837,7 @@
             document.getElementById('ref-username').value = '';
             document.getElementById('ref-password').value = '';
             loadAdminData();
-            alert('Representative saved successfully!');
+            alert('Representative added / updated successfully!');
         }
 
         function deleteRef(index) {
@@ -736,26 +848,38 @@
             }
         }
 
-        // --- REF FUNCTIONS ---
         function loadRefData() {
             const container = document.getElementById('ref-product-selection-list');
             container.innerHTML = '';
 
+            const searchQuery = document.getElementById('ref-search') ? document.getElementById('ref-search').value.toLowerCase() : '';
+
             if (db.products.length === 0) {
-                container.innerHTML = '<p style="color: red;">No products currently available in warehouse. Contact Admin to add items.</p>';
+                container.innerHTML = '<p style="color: red;">No products available. Contact Admin.</p>';
                 return;
             }
 
-            // Group products by category
             const categories = ["Soda 250Ml", "Soda 500Ml", "Soda 750Ml", "Soda 1050Ml", "Soda 1500Ml", "Red Boost & Rastro", "Others"];
+            const categoryIcons = {
+                "Soda 250Ml": "🥤 Soda 250Ml",
+                "Soda 500Ml": "🥤 Soda 500Ml",
+                "Soda 750Ml": "🥤 Soda 750Ml",
+                "Soda 1050Ml": "🥤 Soda 1050Ml",
+                "Soda 1500Ml": "🥤 Soda 1500Ml",
+                "Red Boost & Rastro": "⚡ Red Boost & Rastro Energix",
+                "Others": "📦 Others"
+            };
 
             categories.forEach(cat => {
-                const catProducts = db.products.filter(p => (p.category || 'Others') === cat);
+                const catProducts = db.products.map((p, idx) => ({ ...p, originalIndex: idx })).filter(p => 
+                    (p.category || 'Others') === cat && 
+                    (p.name.toLowerCase().includes(searchQuery) || cat.toLowerCase().includes(searchQuery))
+                );
+
                 if (catProducts.length > 0) {
-                    container.innerHTML += `<div class="category-title">${cat}</div>`;
+                    container.innerHTML += `<div class="category-section-title">${categoryIcons[cat] || cat}</div>`;
                     
                     catProducts.forEach((p) => {
-                        let originalIdx = db.products.findIndex(item => item.name === p.name);
                         let dealerPrice = p.exDealer || p.price || 0;
                         let mrpVal = p.mrp || 0;
 
@@ -765,11 +889,11 @@
                                     <strong>${p.name}</strong><br>
                                     <small style="color: #047857;"><strong>Ex Dealer Price:</strong> LKR ${dealerPrice.toFixed(2)}</small> | 
                                     <small style="color: #b91c1c;"><strong>MRP:</strong> LKR ${mrpVal.toFixed(2)}</small><br>
-                                    <small style="color: #4b5563;">Available Stock: <span id="stock-lbl-${originalIdx}">${p.stock}</span></small>
+                                    <small style="color: #4b5563;">Available Stock: <span id="stock-lbl-${p.originalIndex}">${p.stock}</span></small>
                                 </div>
                                 <div>
                                     <label style="font-size: 0.8rem; margin:0;">Order Qty:</label>
-                                    <input type="number" min="0" max="${p.stock}" value="0" id="order-qty-${originalIdx}" oninput="calculateOrderTotal()" style="width: 90px; text-align: center;">
+                                    <input type="number" min="0" max="${p.stock}" value="0" id="order-qty-${p.originalIndex}" oninput="calculateOrderTotal()" style="width: 90px; text-align: center;">
                                 </div>
                             </div>
                         `;
@@ -783,7 +907,7 @@
             myOrdersTable.innerHTML = '';
             const myOrders = db.orders.filter(o => o.ref === currentUser.username);
             if (myOrders.length === 0) {
-                myOrdersTable.innerHTML = '<tr><td colspan="5" style="text-align:center;">You have not placed any orders yet.</td></tr>';
+                myOrdersTable.innerHTML = '<tr><td colspan="5" style="text-align:center;">No orders placed yet.</td></tr>';
             } else {
                 myOrders.slice().reverse().forEach(o => {
                     let itemsStr = o.items.map(i => `${i.name} (Qty: ${i.qty})`).join(', ');
@@ -816,7 +940,7 @@
         function submitOrder() {
             const shop = document.getElementById('order-shop').value.trim();
             if (!shop) {
-                alert('Please enter the shop or customer name.');
+                alert('Please enter the shop name.');
                 return;
             }
 
@@ -848,7 +972,7 @@
 
             if (stockError) return;
             if (orderedItems.length === 0) {
-                alert('Please select at least one item quantity to place an order.');
+                alert('Please select at least one item quantity.');
                 return;
             }
 
@@ -870,7 +994,7 @@
 
             db.orders.push(newOrder);
             saveData();
-            alert('Order submitted successfully and warehouse stock updated!');
+            alert('Order submitted successfully!');
             loadRefData();
         }
     </script>
