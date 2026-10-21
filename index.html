@@ -106,7 +106,7 @@ function seed(){
 }
 
 /* ===== STATE / HELPERS ===== */
-let S={products:[],orders:[],refs:[]},user=null,ready=false,unsubs=[],seeded=false,loginErr="";
+let S={products:[],orders:[],refs:[],offers:[]},user=null,ready=false,unsubs=[],seeded=false,loginErr="";
 let tab="order",cart={},shopName="",msg="",lrole="admin",ocat="Soda",osz=250,brep="";
 let db,auth,auth2,F;
 const $=s=>document.querySelector(s);
@@ -114,6 +114,22 @@ const money=n=>"Rs "+(+n||0).toLocaleString("en-US",{maximumFractionDigits:2});
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
 const bpOf=p=>p.bp>0?p.bp:p.exd;
+const prodById=id=>S.products.find(p=>p.id===id);
+function offerMatches(o,p){return o.active!==false&&(o.scope==="size"?(p.cat==="Soda"&&p.size===o.buySize):p.id===o.buyPid);}
+function calcFree(c){
+  const m={};
+  S.offers.forEach(o=>S.products.forEach(p=>{
+    const q=c[p.id]||0;
+    if(q>0&&q>=o.n&&offerMatches(o,p)){m[o.freePid]=(m[o.freePid]||0)+(o.repeat?Math.floor(q/o.n):1)*o.m;}
+  }));
+  return m;
+}
+function freeName(o){const p=prodById(o.freePid);return p?p.name:"?";}
+function offerText(o){
+  const b=o.scope==="size"?"any "+o.buySize+" ml soda (each flavor counted separately)":(prodById(o.buyPid)||{name:"?"}).name;
+  return "Buy "+o.n+" pcs of "+b+", get "+o.m+" pcs "+freeName(o)+" free"+(o.repeat?" (for every "+o.n+" pcs)":" (once)");
+}
+function offerHint(p){return S.offers.filter(o=>offerMatches(o,p)).map(o=>`<div class="mute" style="color:var(--ok)">Offer: buy ${o.n}, get ${o.m} ${esc(freeName(o))} free${o.repeat?" (every "+o.n+")":""}</div>`).join("");}
 const note=(t,k)=>`<div class="note ${k}">${esc(t)}</div>`;
 
 /* ===== VIEWS ===== */
@@ -161,7 +177,7 @@ function billsHTML(){
   return top+L.map(o=>`<div class="card bill ${o.status}">
     <div class="row"><b>Bill #${o.id}</b><span class="badge ${o.status}">${o.status=="active"?"Active":"Cancelled"}</span></div>
     <div class="mute">${new Date(o.time).toLocaleString()}, Rep: ${esc(o.rep)}, Shop: ${esc(o.shop)}</div>
-    <ul>${o.items.map(i=>`<li>${esc(i.name)} x ${i.qty} @ ${money(i.price)}</li>`).join("")}</ul>
+    <ul>${o.items.map(i=>`<li>${esc(i.name)} x ${i.qty} ${i.free?'<b style="color:var(--ok)">FREE</b>':"@ "+money(i.price)}</li>`).join("")}</ul>
     <div class="row"><b>${money(o.total)}</b>${o.status=="active"?`<button class="sm" data-act="cancel" data-v="${o.id}">Cancel bill</button>`:""}</div>
     ${o.status=="cancelled"?`<div class="mute">Reason: ${esc(o.reason)}${o.note?" - "+esc(o.note):""}<br>Returned to stock: ${sum(o.items,i=>i.back||0)} pcs. Lost / damaged: ${money(o.lost)}</div>`:""}
   </div>`).join("");
@@ -171,6 +187,22 @@ function repsHTML(){
   return `<div class="card"><b>Create rep login</b><div style="display:grid;gap:8px;margin-top:8px"><input id="rn" placeholder="Rep name"><input id="ri" placeholder="Rep ID (letters / numbers, used to log in)" autocapitalize="none"><input id="rp" placeholder="Password (min 6 characters)"></div>
   <p><button class="pri" data-act="addrep">Create rep</button></p><div class="mute">A rep can log in only after you create the ID and password here. Reps can change their own password in Settings. Press Remove to block a rep.</div></div>
   ${S.refs.map(r=>`<div class="card row"><span><b>${esc(r.name)}</b><br><span class="mute">ID: ${esc(r.id)}</span></span><button class="sm" data-act="delrep" data-v="${esc(r.uid)}">Remove</button></div>`).join("")||'<div class="card mute">No reps yet. Create one above.</div>'}`;
+}
+
+function offersHTML(){
+  const sodas=S.products.filter(p=>p.cat=="Soda");
+  const opt=p=>`<option value="${p.id}">${esc(p.name)}</option>`;
+  return `<div class="card" style="display:grid;gap:8px"><b>Create free-soda offer</b>
+  <label class="mute">When the bill has</label>
+  <select id="ofb"><optgroup label="Each flavor of a size, counted separately">${SIZES.map(z=>`<option value="s:${z}">Any ${z} ml soda</option>`).join("")}</optgroup>
+  <optgroup label="One product only">${S.products.map(p=>`<option value="p:${p.id}">${esc(p.name)}</option>`).join("")}</optgroup></select>
+  <input id="ofn" type="number" inputmode="numeric" min="1" placeholder="Quantity needed (pieces), e.g. 24">
+  <label class="mute">Give this free</label>
+  <select id="off">${S.products.map(opt).join("")}</select>
+  <input id="ofm" type="number" inputmode="numeric" min="1" placeholder="Free quantity (pieces), e.g. 2">
+  <label class="row" style="justify-content:flex-start"><input id="ofr" type="checkbox" checked style="width:22px;height:22px"> Repeat for every full quantity (48 pcs gives double)</label>
+  <button class="pri" data-act="addoffer">Add offer</button></div>
+  ${S.offers.map(o=>`<div class="card row"><span>${esc(offerText(o))}</span><button class="sm" data-act="deloffer" data-v="${o.id}">Delete</button></div>`).join("")||'<div class="card mute">No offers yet.</div>'}`;
 }
 
 function settingsHTML(){
@@ -183,9 +215,10 @@ function cnt(f){return sum(S.products.filter(f),p=>cart[p.id]||0);}
 function chip(act,v,label,n,on){return `<button class="chip ${on?"on":""}" data-act="${act}" data-v="${v}">${label}${n?`<i>${n}</i>`:""}</button>`;}
 
 function sumHTML(){
-  const L=S.products.filter(p=>cart[p.id]>0);
+  const L=S.products.filter(p=>cart[p.id]>0),fr=calcFree(cart),F=Object.entries(fr);
   if(!L.length)return '<span class="mute">No items selected yet. Pick a category above and tap +.</span>';
-  return '<b>Selected items</b><ul class="sel">'+L.map(p=>`<li>${esc(p.name)} x ${cart[p.id]} = ${money(cart[p.id]*bpOf(p))}</li>`).join("")+'</ul>';
+  return '<b>Selected items</b><ul class="sel">'+L.map(p=>`<li>${esc(p.name)} x ${cart[p.id]} = ${money(cart[p.id]*bpOf(p))}</li>`).join("")+'</ul>'
+   +(F.length?'<div style="color:var(--ok);margin-top:6px"><b>Free (offer)</b><ul class="sel">'+F.map(([id,q])=>`<li>${esc((prodById(id)||{name:id}).name)} x ${q} FREE</li>`).join("")+'</ul></div>':"");
 }
 
 function orderHTML(){
@@ -199,7 +232,7 @@ function orderHTML(){
   if(!list.length)h+='<span class="mute">No products yet.</span>';
   list.forEach(p=>{
     const q=cart[p.id]||0;
-    h+=`<div class="prod"><div><b>${esc(p.name)}</b><div class="mute">${p.stock>0?"In stock: "+p.stock:"Out of stock"}, ${money(bpOf(p))} each</div></div>
+    h+=`<div class="prod"><div><b>${esc(p.name)}</b><div class="mute">${p.stock>0?"In stock: "+p.stock:"Out of stock"}, ${money(bpOf(p))} each</div>${offerHint(p)}</div>
     <div class="step"><button data-act="dec" data-v="${p.id}" ${q?"":"disabled"}>-</button>
     <input type="number" inputmode="numeric" min="0" data-id="${p.id}" data-f="qty" value="${q||""}" placeholder="0" class="${q>p.stock?"over":""}">
     <button data-act="inc" data-v="${p.id}" ${p.stock>0?"":"disabled"}>+</button></div></div>`;
@@ -221,12 +254,12 @@ function render(force){
   if(!force&&ae&&/INPUT|SELECT|TEXTAREA/.test(ae.tagName)&&app.contains(ae))return;
   if(!user){app.innerHTML=loginHTML();return;}
   const adm=user.role==="admin";
-  const tabs=adm?[["order","New bill"],["stock","Stock"],["bills","Bills"],["reps","Reps"],["settings","Settings"]]:[["order","New bill"],["bills","My bills"],["settings","Settings"]];
+  const tabs=adm?[["order","New bill"],["stock","Stock"],["bills","Bills"],["reps","Reps"],["offers","Offers"],["settings","Settings"]]:[["order","New bill"],["bills","My bills"],["settings","Settings"]];
   app.innerHTML=`<header><b>RAJ BROS MARKETING</b><span class="mute">${adm?"Admin":esc(user.name)}</span><button class="sm" data-act="logout">Log out</button></header>`
    +(adm?statsHTML():"")
    +`<nav>${tabs.map(([k,l])=>`<button class="${tab===k?"on":""}" data-act="tab" data-v="${k}">${l}</button>`).join("")}</nav>`
    +msg
-   +(tab=="stock"?stockHTML():tab=="bills"?billsHTML():tab=="reps"?repsHTML():tab=="settings"?settingsHTML():orderHTML());
+   +(tab=="stock"?stockHTML():tab=="bills"?billsHTML():tab=="reps"?repsHTML():tab=="offers"?offersHTML():tab=="settings"?settingsHTML():orderHTML());
   updateTot();
 }
 
@@ -242,6 +275,7 @@ function startListening(){
     if(user.role==="admin"&&s.empty&&!s.metadata.fromCache&&!seeded)seedProducts();
     render();
   },listenErr));
+  unsubs.push(db.collection("offers").onSnapshot(s=>{S.offers=s.docs.map(d=>({id:d.id,...d.data()}));render();},listenErr));
   const q=user.role==="admin"?db.collection("orders").orderBy("time","desc").limit(500):db.collection("orders").where("repId","==",user.uid).limit(200);
   unsubs.push(q.onSnapshot(s=>{S.orders=s.docs.map(d=>d.data()).sort((a,b)=>b.time-a.time);render();},listenErr));
   if(user.role==="admin")unsubs.push(db.collection("refs").onSnapshot(s=>{S.refs=s.docs.map(d=>({uid:d.id,...d.data()})).sort((a,b)=>a.name.localeCompare(b.name));render();},listenErr));
@@ -267,19 +301,25 @@ async function submitOrder(){
   const shop=shopName.trim(),lines=Object.entries(cart).filter(([k,v])=>v>0);
   if(!shop){msg=note("Enter the shop name.","err");render(true);return;}
   if(!lines.length){msg=note("Add at least one product quantity.","err");render(true);return;}
+  const fr=calcFree(cart),need={};
+  lines.forEach(([id,q])=>{need[id]=(need[id]||0)+q;});
+  Object.entries(fr).forEach(([id,q])=>{need[id]=(need[id]||0)+q;});
   try{
     const r=await db.runTransaction(async t=>{
       const cref=db.doc("meta/counter"),cs=await t.get(cref);
-      const ps=await Promise.all(lines.map(([id])=>t.get(db.doc("products/"+id))));
-      const bad=[],items=[],upd=[];
-      lines.forEach(([id,q],i)=>{
-        const p=ps[i].exists?ps[i].data():null;
-        if(!p||p.stock<q)bad.push((p?p.name:id)+": only "+(p?p.stock:0)+" in stock, you ordered "+q);
-        else{items.push({pid:id,name:p.name,qty:q,price:bpOf(p)});upd.push([ps[i].ref,p.stock-q]);}
+      const ids=Object.keys(need),P={};
+      const snaps=await Promise.all(ids.map(id=>t.get(db.doc("products/"+id))));
+      ids.forEach((id,i)=>{P[id]=snaps[i];});
+      const bad=[];
+      ids.forEach(id=>{
+        const p=P[id].exists?P[id].data():null;
+        if(!p||p.stock<need[id])bad.push((p?p.name:id)+": only "+(p?p.stock:0)+" in stock, needed "+need[id]+(fr[id]?" (including "+fr[id]+" free)":""));
       });
       if(bad.length)return {bad};
+      const items=lines.map(([id,q])=>({pid:id,name:P[id].data().name,qty:q,price:bpOf(P[id].data())}));
+      Object.entries(fr).forEach(([id,q])=>items.push({pid:id,name:P[id].data().name,qty:q,price:0,free:true}));
+      ids.forEach(id=>t.update(P[id].ref,{stock:P[id].data().stock-need[id]}));
       const n=(cs.exists?cs.data().n:0)+1;
-      upd.forEach(([ref,st])=>t.update(ref,{stock:st}));
       t.set(cref,{n});
       t.set(db.doc("orders/"+n),{id:n,rep:who.name,repId:who.id,shop,time:Date.now(),items,total:sum(items,i=>i.qty*i.price),status:"active"});
       return {ok:n};
@@ -296,7 +336,7 @@ function openCancel(id){
   <label>Reason</label><select id="cr">${REASONS.map(r=>`<option>${r}</option>`).join("")}</select>
   <label>Note (optional)</label><input id="cn">
   <label>How many pieces came back in good condition? The rest count as lost / damaged.</label>
-  ${o.items.map((it,i)=>`<div class="row" style="margin:4px 0"><span>${esc(it.name)} (billed ${it.qty})</span><input type="number" min="0" max="${it.qty}" value="${it.qty}" data-back="${i}" style="width:80px"></div>`).join("")}
+  ${o.items.map((it,i)=>`<div class="row" style="margin:4px 0"><span>${esc(it.name)}${it.free?" (FREE)":""} (billed ${it.qty})</span><input type="number" min="0" max="${it.qty}" value="${it.qty}" data-back="${i}" style="width:80px"></div>`).join("")}
   <div class="row" style="margin-top:12px"><button data-act="close">Keep bill</button><button class="pri" data-act="docancel" data-v="${o.id}">Cancel bill</button></div>`;
   $("#dlg").showModal();
 }
@@ -308,17 +348,25 @@ async function doCancel(id){
     await db.runTransaction(async t=>{
       const oref=db.doc("orders/"+id),os=await t.get(oref);
       if(!os.exists||os.data().status!=="active")return;
-      const o=os.data();
-      const ps=await Promise.all(o.items.map(it=>t.get(db.doc("products/"+it.pid))));
-      o.items.forEach((it,i)=>{
-        const b=Math.min(it.qty,Math.max(0,backs[i]||0));it.back=b;
-        if(ps[i].exists&&b>0)t.update(ps[i].ref,{stock:ps[i].data().stock+b});
-      });
+      const o=os.data(),back={};
+      o.items.forEach((it,i)=>{const b=Math.min(it.qty,Math.max(0,backs[i]||0));it.back=b;back[it.pid]=(back[it.pid]||0)+b;});
+      const ids=Object.keys(back);
+      const ps=await Promise.all(ids.map(pid=>t.get(db.doc("products/"+pid))));
+      ps.forEach((sn,i)=>{if(sn.exists&&back[ids[i]]>0)t.update(sn.ref,{stock:sn.data().stock+back[ids[i]]});});
       t.update(oref,{status:"cancelled",reason,note:nt,by:user.role==="admin"?"Admin":user.name,items:o.items,lost:sum(o.items,i=>(i.qty-i.back)*i.price)});
     });
     msg=note("Bill #"+id+" cancelled. Stock updated.","ok");
   }catch(e){msg=note("Could not cancel: "+e.message,"err");}
   $("#dlg").close();render(true);
+}
+
+async function addOffer(){
+  const sc=$("#ofb").value,n=Math.floor(+$("#ofn").value),fp=$("#off").value,m=Math.floor(+$("#ofm").value),rep=$("#ofr").checked;
+  if(!(n>0)||!(m>0)||!fp){msg=note("Enter the quantity needed, the free product and the free quantity.","err");render(true);return;}
+  const o={n,m,freePid:fp,repeat:rep,active:true,created:Date.now()};
+  if(sc.startsWith("s:")){o.scope="size";o.buySize=+sc.slice(2);}else{o.scope="product";o.buyPid=sc.slice(2);}
+  try{await db.collection("offers").add(o);msg=note("Offer added.","ok");}catch(e){msg=note(e.message,"err");}
+  render(true);
 }
 
 async function addRep(){
@@ -377,11 +425,13 @@ document.addEventListener("click",e=>{
   else if(a=="addrep")addRep();
   else if(a=="delrep"){if(confirm("Remove this rep? They will not be able to log in."))db.doc("refs/"+v).delete().catch(x=>{msg=note(x.message,"err");render(true);});}
   else if(a=="chpass")changePass();
+  else if(a=="addoffer")addOffer();
+  else if(a=="deloffer"){if(confirm("Delete this offer?"))db.doc("offers/"+v).delete().catch(x=>{msg=note(x.message,"err");render(true);});}
   else if(a=="ocat"){ocat=v;render(true);}
   else if(a=="osz"){osz=+v;render(true);}
   else if(a=="inc"||a=="dec"){const y=scrollY;cart[v]=Math.max(0,(cart[v]||0)+(a=="inc"?1:-1));render(true);scrollTo(0,y);}
   else if(a=="csvstock")csv("stock",[["Category","Product","Stock","Ex Factory","Ex Dealer","MRP","Bill price"]].concat(S.products.map(p=>[p.cat,p.name,p.stock,p.exf,p.exd,p.mrp,bpOf(p)])));
-  else if(a=="csvbills")csv("bills",[["Bill","Date","Rep","Shop","Status","Items","Total","Reason","Note","Returned pcs","Lost / damaged value"]].concat(S.orders.map(o=>[o.id,new Date(o.time).toLocaleString(),o.rep,o.shop,o.status,o.items.map(i=>i.name+" x"+i.qty).join("; "),o.total,o.reason||"",o.note||"",o.status=="cancelled"?sum(o.items,i=>i.back||0):"",o.lost||""])));
+  else if(a=="csvbills")csv("bills",[["Bill","Date","Rep","Shop","Status","Items","Total","Reason","Note","Returned pcs","Lost / damaged value"]].concat(S.orders.map(o=>[o.id,new Date(o.time).toLocaleString(),o.rep,o.shop,o.status,o.items.map(i=>i.name+" x"+i.qty+(i.free?" (FREE)":"")).join("; "),o.total,o.reason||"",o.note||"",o.status=="cancelled"?sum(o.items,i=>i.back||0):"",o.lost||""])));
 });
 
 document.addEventListener("change",e=>{
@@ -409,7 +459,7 @@ if(FIREBASE_CONFIG){
   db=firebase.firestore();auth=firebase.auth();F=firebase.firestore.FieldValue;
   auth2=firebase.initializeApp(FIREBASE_CONFIG,"creator").auth(); // used only to create rep logins
   auth.onAuthStateChanged(async u=>{
-    unsubs.forEach(f=>f());unsubs=[];user=null;S={products:[],orders:[],refs:[]};
+    unsubs.forEach(f=>f());unsubs=[];user=null;S={products:[],orders:[],refs:[],offers:[]};
     if(u){
       if(u.email===ADMIN_EMAIL)user={role:"admin",uid:u.uid};
       else{
