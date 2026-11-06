@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2457c5">
+<title>THUGIRAA TRADERS</title>
+<style>
+:root{--bg:#f3f5f8;--card:#fff;--ink:#17202e;--mute:#5d6b7d;--line:#dbe1ea;--acc:#2457c5;--ok:#17803d;--warn:#b45309;--bad:#c8321e}
+@media(prefers-color-scheme:dark){:root{--bg:#111620;--card:#1a2230;--ink:#eaf0f8;--mute:#9aa8bb;--line:#2b3647;--acc:#6b9bff;--ok:#4ade80;--warn:#fbbf24;--bad:#ef5a43}}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+#app{max-width:980px;margin:0 auto;padding:0 12px 100px}
+header{display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top,0px)) 0 12px}
+header b{font-size:18px;flex:1}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0}
+.mute{color:var(--mute);font-size:13px}
+.stats{display:flex;gap:8px;overflow-x:auto;padding:8px 0}
+.stats div{flex:0 0 auto;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:8px;padding:6px 12px}
+.stats span{display:block;font-size:12px;color:var(--mute)}
+nav{display:flex;gap:6px;margin:8px 0;overflow-x:auto}
+button{font:inherit;min-height:38px;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:8px 14px;white-space:nowrap}
+button.on,button.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+button.sm{padding:4px 10px;font-size:13px;min-height:30px}
+button:disabled{opacity:.4}
+:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 8px;width:100%}
+td input{width:90px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px}
+th,td{padding:5px 6px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-size:13px;color:var(--mute)}
+tr.grp td{background:var(--bg);font-weight:600;padding:8px 6px}
+input.low{border-color:var(--warn);color:var(--warn)}
+input.zero,input.over{border-color:var(--bad);color:var(--bad)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--line)}
+.bill.cancelled{border-left:4px solid var(--bad)}.bill.active{border-left:4px solid var(--ok)}
+.note{padding:10px 12px;border-radius:8px;margin:10px 0}
+.note.err{background:rgba(200,50,30,.12);color:var(--bad)}.note.ok{background:rgba(23,128,61,.14);color:var(--ok)}
+.login{max-width:360px;margin:12vh auto;display:grid;gap:10px}
+.seg{display:flex;gap:6px}.seg button{flex:1}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px))}
+.bar div{max-width:980px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(440px,94vw)}
+dialog label{display:block;margin:8px 0 3px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{border-radius:99px;padding:7px 14px}
+.chip i{font-style:normal;font-size:12px;background:var(--ok);color:#fff;border-radius:99px;padding:1px 7px;margin-left:6px}
+.prod{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.prod:last-child{border-bottom:0}
+.prod{flex-wrap:wrap}
+.three{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:6px;width:310px;max-width:100%}
+.ebi{padding:10px 0;border-bottom:1px solid var(--line)}
+.irow{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:6px;margin-top:6px}
+.irow .mute{display:block}
+.catb{font-weight:700;margin:14px 0 4px;padding:5px 10px;background:var(--bg);border-radius:6px}
+.grp2{padding:10px 0;border-bottom:1px solid var(--line)}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:6px}
+.vc{border:1px solid var(--line);border-radius:8px;padding:8px}
+.vc .step{margin-top:6px}.vc .step input{width:52px;padding:7px 2px}.vc .step button{width:36px}
+tr.sub td{background:var(--bg);font-weight:600;font-size:13px;padding:4px 6px}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:42px;padding:0;font-size:20px}
+.step input{width:64px;text-align:center}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid{display:grid;gap:8px;margin-top:8px}
+ul.sel{margin:4px 0;padding-left:18px}
+#printArea{display:none}
+@media print{
+  html,body{background:#fff!important}
+  #app,#dlg{display:none!important}
+  #printArea{display:block!important;padding:10mm;color:#000;font:13px/1.4 Arial,Helvetica,sans-serif}
+  #printArea h1{font-size:22px;margin:0;text-align:center}
+  #printArea .c{text-align:center;margin:2px 0}
+  #printArea table{width:100%;min-width:0;border-collapse:collapse;margin:10px 0}
+  #printArea th,#printArea td{border-bottom:1px solid #999;padding:4px 3px;color:#000}
+  #printArea .r{text-align:right}
+  #printArea .stamp{border:2px solid #000;text-align:center;font-weight:bold;font-size:18px;padding:4px;margin:8px 0}
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<dialog id="dlg"></dialog>
+<style id="pageStyle">@page{size:A5;margin:0}</style>
+<div id="printArea"></div>
+<script>
+/* ===== SETTINGS =====
+1) Create a NEW Firebase project, add a Web app, and paste its config below.
+2) Authentication > Sign-in method: enable Email/Password. Add user admin@thugiraa.app with your admin password.
+3) Firestore Database: create it, then paste these rules:
+rules_version='2';
+service cloud.firestore{match /databases/{d}/documents{
+ function adm(){return request.auth!=null&&request.auth.token.email=='admin@thugiraa.app';}
+ function rep(){return request.auth!=null&&exists(/databases/$(d)/documents/refs/$(request.auth.uid));}
+ match /refs/{u}{allow read:if adm()||request.auth.uid==u;allow create,delete:if adm();allow update:if adm()||request.auth.uid==u;}
+ match /products/{p}{allow read:if adm()||rep();allow create,delete:if adm();allow update:if adm()||rep();}
+ match /offers/{o}{allow read:if adm()||rep();allow write:if adm();}
+ match /meta/{m}{allow read:if adm()||rep();allow write:if adm()||(m=='counter'&&rep());}
+ match /orders/{o}{allow read:if adm()||(rep()&&resource.data.repId==request.auth.uid);allow create:if adm()||rep();allow update:if adm()||(rep()&&resource.data.repId==request.auth.uid);}
+}}
+*/
+const FIREBASE_CONFIG={
+  apiKey: "AIzaSyC7n2Dp5tu2SA2ELbtPWGJWtOo9OxfUUJw",
+  authDomain: "tugiraa-traders.firebaseapp.com",
+  projectId: "tugiraa-traders",
+  storageBucket: "tugiraa-traders.firebasestorage.app",
+  messagingSenderId: "789549450920",
+  appId: "1:789549450920:web:ca05954c04718ac159249d"
+};
+const ADMIN_EMAIL="admin@thugiraa.app",DOMAIN="@thugiraa.app",NAME="THUGIRAA TRADERS";
+const REASONS=["Shop refused / not needed","Wrong item delivered","Damaged goods","Price issue","Ordered by mistake","Other"];
+
+let S={products:[],orders:[],refs:[],offers:[],shop:{}},user=null,ready=false,unsubs=[],loginErr="",lrole="admin";
+let tab="order",cart={},freeCart={},cat="",qs="",shopName="",shopAddr="",shopTel="",disc={FANCY:"",STATIONERY:""},ret={FANCY:"",STATIONERY:""},osec="FANCY",ld={},pr={},eb=null,ebsq="",remark="",bsort="new",dsrc={FANCY:"pct",STATIONERY:"pct"},dRs={FANCY:"",STATIONERY:""},pay="Cash",sq="",sf="all",bq="",bf="all",brep="",msg="",lastFree="";
+let db,auth,auth2,F;
+const $=s=>document.querySelector(s);
+const money=n=>"Rs "+(+n||0).toLocaleString("en-US",{maximumFractionDigits:2});
+const fmt=n=>(+n||0).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+const note=(t,k)=>`<div class="note ${k}">${esc(t)}</div>`;
+const prodById=id=>S.products.find(p=>p.id===id);
+const SECS=["FANCY","STATIONERY"],PRE={FANCY:"FN",STATIONERY:"ST"},secOf=p=>p.sec||"FANCY";
+const HEAD={FANCY:{t:"THUGIRAA TRADERS (PVT) (LTD)"},STATIONERY:{t:"SUPERIOR",s:"Designed for brilliance",d:"Authorized Distributor - Thugiraa Traders"}};
+const PAY=["Cash","Credit","Cheque"],CODEP={FANCY:"TTF",STATIONERY:"TTS"};
+const maxCode=sc=>Math.max(0,...S.products.filter(p=>secOf(p)===sc&&p.code).map(p=>parseInt(String(p.code).replace(/\D/g,""))||0));
+const varOf=p=>{if(p.base)return {base:p.base,v:p.var||""};const m=p.name.trim().match(/^(.+?)\s+(\d+(?:\.\d+)?\s?[A-Za-z]{0,4}|small|medium|large)$/i);return m?{base:m[1].trim(),v:m[2].trim()}:{base:p.name.trim(),v:""};};
+const mrpOf=i=>i.mrp||(prodById(i.pid)||{}).mrp||0;
+const due=o=>o.status==="active"&&o.paid!=null?Math.max(0,o.total-o.paid):0;
+const shopAd=()=>S.shop.addr||"No: 43A, Jeyanthinagar, Kilinochchi",shopTl=()=>S.shop.tel||"0742770666";
+const catOf=p=>String(p.cat||"").trim().toUpperCase(),DEFCAT={FANCY:["FANCY","LEXA"],STATIONERY:[]};
+const cats=s=>[...new Set((DEFCAT[s]||[]).concat(S.products.filter(p=>secOf(p)===s).map(catOf)))].sort();
+const err=x=>{msg=note("Error: "+x.message,"err");render(true);};
+
+/* ===== OFFERS & TOTALS ===== */
+function calcFree(){
+  const m={};
+  S.offers.forEach(o=>{const q=cart[o.buyPid]||0;if(q>0&&q>=o.n)m[o.freePid]=(m[o.freePid]||0)+(o.repeat?Math.floor(q/o.n):1)*o.m;});
+  return m;
+}
+function allFree(){const m=calcFree();Object.entries(freeCart).forEach(([id,q])=>{if(q>0)m[id]=(m[id]||0)+q;});Object.keys(m).forEach(id=>{if(!prodById(id))delete m[id];});return m;}
+function offerText(o){const b=prodById(o.buyPid),f=prodById(o.freePid);return "Buy "+o.n+" x "+(b?b.name:"?")+", get "+o.m+" x "+(f?f.name:"?")+" free"+(o.repeat?" (for every "+o.n+")":" (once)");}
+function offerHint(p){return S.offers.filter(o=>o.buyPid===p.id).map(o=>{const f=prodById(o.freePid);return `<div class="mute" style="color:var(--ok)">Offer: buy ${o.n}, get ${o.m} ${esc(f?f.name:"?")} free${o.repeat?" (every "+o.n+")":""}</div>`;}).join("");}
+function discOfX(st,x,gross){
+  if(st.dsrc[x]==="rs"){const less=Math.min(gross,Math.max(0,Math.round((+st.dRs[x]||0)*100)/100));return {dp:gross>0?Math.round(less/gross*10000)/100:0,less};}
+  const dp=Math.min(100,Math.max(0,+st.disc[x]||0));return {dp,less:Math.round(gross*dp)/100};
+}
+const discOf=(x,gross)=>discOfX({disc,dRs,dsrc},x,gross);
+function syncDisc(){
+  SECS.forEach(x=>{
+    const T=totals(x),pc=dsrc[x]==="pct",v=pc?T.less:T.dp,k=pc?"dRs":"disc",e=$(`[data-f="${k}"][data-sec="${x}"]`),str=v>0?String(+(+v).toFixed(2)):"";
+    ({disc,dRs})[k][x]=str;if(e&&document.activeElement!==e)e.value=str;
+  });
+}
+function lineLessX(m,id,qty,price){
+  const g=qty*price,d=m[id]||{};
+  if(d.s==="rs")return Math.min(g,Math.max(0,Math.round((+d.r||0)*100)/100));
+  return Math.round(g*Math.min(100,Math.max(0,+d.p||0)))/100;
+}
+const lineLess=(id,qty,price)=>lineLessX(ld,id,qty,price);
+const effP=p=>{const v=+pr[p.id];return v>0?v:p.price;};
+function totals(s){
+  const L=S.products.filter(p=>secOf(p)===s&&cart[p.id]>0),gross=sum(L,p=>cart[p.id]*effP(p)),idisc=Math.round(sum(L,p=>lineLess(p.id,cart[p.id],effP(p)))*100)/100,{dp,less}=discOf(s,gross-idisc),rt=Math.max(0,+ret[s]||0);
+  return {L,gross,idisc,dp,less,rt,all:Math.round((idisc+less)*100)/100,total:Math.max(0,Math.round((gross-idisc-less-rt)*100)/100)};
+}
+
+/* ===== VIEWS ===== */
+function loginHTML(){
+  return `<div class="card login"><h2 style="margin:0">${NAME}</h2>
+  <div class="seg"><button class="${lrole=="admin"?"on":""}" data-act="role" data-v="admin">Admin</button><button class="${lrole=="rep"?"on":""}" data-act="role" data-v="rep">Rep</button></div>
+  ${lrole=="admin"?'<input id="lp" type="password" placeholder="Admin password">':'<input id="ln" placeholder="Rep ID" autocapitalize="none" autocorrect="off" spellcheck="false"><input id="lp" type="password" placeholder="Password">'}
+  <button class="pri" data-act="login">Log in</button><div class="note err" style="${loginErr?"":"display:none"}" id="lerr">${esc(loginErr)}</div></div>`;
+}
+
+function statsHTML(){
+  const P=S.products,can=S.orders.filter(o=>o.status=="cancelled"),act=S.orders.filter(o=>o.status=="active"),t0=new Date().setHours(0,0,0,0),fx=sum(P,p=>p.stock*p.cost);
+  const c=[["Items in stock",sum(P,p=>p.stock)+" pcs"],["Stock value (Ex Dealer)",money(sum(P,p=>p.stock*p.price))],["Stock value (MRP)",money(sum(P,p=>p.stock*p.mrp))],...(fx>0?[["Stock value (Ex Factory)",money(fx)]]:[]),["Sales today",money(sum(act.filter(o=>o.time>=t0),o=>o.total))],["Credit due",money(sum(S.orders,o=>due(o)))],["Low stock items",P.filter(p=>p.stock<=10).length],["Cancelled bills",can.length],["Lost / damaged",money(sum(can,o=>o.lost||0))]];
+  return `<div class="stats">${c.map(([l,v])=>`<div><span>${l}</span><b>${v}</b></div>`).join("")}</div>`;
+}
+
+function stockHTML(){
+  return `${importCard()}<div class="card"><b>Add new item</b><div class="grid">
+  <select id="psec">${SECS.map(x=>`<option ${x===osec?"selected":""}>${x}</option>`).join("")}</select>
+  <input id="pc" list="cl" placeholder="Category (FANCY or LEXA for fancy items)"><datalist id="cl">${[...new Set(SECS.flatMap(cats))].sort().map(c=>`<option value="${esc(c)}">`).join("")}</datalist>
+  <input id="pn" placeholder="Item name (e.g. EX, Clear Glue, Box file)">
+  <input id="pv" placeholder="Sizes / variants, optional (e.g. 40P,80P,120P or 25ml,50ml)">
+  <div class="two"><input id="ps" type="number" inputmode="numeric" min="0" placeholder="Opening stock"><input id="pk" type="number" inputmode="decimal" step="0.01" placeholder="Ex Factory"></div>
+  <div class="two"><input id="pb" type="number" inputmode="decimal" step="0.01" placeholder="Ex Dealer (billing price)"><input id="pm" type="number" inputmode="decimal" step="0.01" placeholder="MRP"></div>
+  <button class="pri" data-act="addprod">Add item</button></div>
+  <div class="mute" style="margin-top:6px">If you type variants, one item is made for each (e.g. "EX 40P", "EX 80P") with the same stock and prices. Edit each one below.</div></div>
+    <div class="card"><div class="two"><input data-f="sq" placeholder="Search items" value="${esc(sq)}"><select data-f="sf"><option value="all" ${sf=="all"?"selected":""}>All items</option><option value="low" ${sf=="low"?"selected":""}>Low stock (10 or less)</option><option value="out" ${sf=="out"?"selected":""}>Out of stock</option></select></div><p style="margin:8px 0 0"><button class="sm" data-act="csvstock">Download stock (CSV)</button></p></div>
+  <div class="mute" style="margin:6px 4px">${esc(stockSummary())}</div><div class="card scroll"><table><thead><tr><th>Code</th><th>Item</th><th>Stock</th><th>Add stock</th><th>Ex Factory</th><th>Ex Dealer (bill price)</th><th>MRP</th><th></th></tr></thead><tbody id="srows">${stockRows()}</tbody></table></div><p class="mute">Ex Dealer price is the billing price used on bills. Changes save when you leave a field. Red = out of stock, orange = 10 or fewer left.</p><p>${S.products.some(p=>!p.code)?'<button class="sm" data-act="mkcodes">Give codes to items without a code</button> ':""}<button class="sm" data-act="fillprices">Fill prices from price list</button> <button class="sm" data-act="importstock">Reload starting stock list</button> <button class="sm" data-act="wipe" style="color:var(--bad)">Delete ALL stock items (start fresh)</button></p>`;
+}
+
+function billsHTML(){
+  return `<div class="card"><input data-f="bq" placeholder="Search shop, rep, bill no, remark" value="${esc(bq)}"><div class="two" style="margin-top:8px"><select data-f="bf">${[["all","All bills"],["today","Today"],["yest","Yesterday"],["month","This month"],["due","Credit due"],["can","Cancelled"]].map(([k,l])=>`<option value="${k}" ${bf==k?"selected":""}>${l}</option>`).join("")}</select><select data-f="bs"><option value="new" ${bsort=="new"?"selected":""}>Newest first</option><option value="old" ${bsort=="old"?"selected":""}>Oldest first</option></select></div>${user.role==="admin"?'<p style="margin:8px 0 0"><button class="sm" data-act="csvbills">Download bills (CSV)</button></p>':""}</div><div id="blist">${billList()}</div>`;
+}
+
+function repsHTML(){
+  return `<div class="card"><b>Create rep login</b><div class="grid"><input id="rn" placeholder="Rep name"><input id="ri" placeholder="Rep ID (letters / numbers, used to log in)" autocapitalize="none"><input id="rp" placeholder="Password (min 6 characters)"><input id="rt" type="tel" placeholder="Rep phone (optional)"><button class="pri" data-act="addrep">Create rep</button></div>
+  <div class="mute" style="margin-top:6px">A rep can log in only after you create the ID and password here. Press Remove to block a rep.</div></div>
+  ${S.refs.map(r=>`<div class="card row"><span><b>${esc(r.name)}</b><br><span class="mute">ID: ${esc(r.id)}${r.phone?", Tel: "+esc(r.phone):""}</span></span><button class="sm" data-act="delrep" data-v="${esc(r.uid)}">Remove</button></div>`).join("")||'<div class="card mute">No reps yet.</div>'}`;
+}
+
+function offersHTML(){
+  const opt=S.products.map(p=>`<option value="${p.id}">${secOf(p)}: ${esc(catOf(p))}: ${esc(p.name)}</option>`).join("");
+  return `<div class="card"><b>Create free-item offer</b><div class="grid">
+  <label class="mute">When the bill has</label><select id="ofb">${opt}</select>
+  <input id="ofn" type="number" inputmode="numeric" min="1" placeholder="Quantity needed, e.g. 12">
+  <label class="mute">Give this free</label><select id="off">${opt}</select>
+  <input id="ofm" type="number" inputmode="numeric" min="1" placeholder="Free quantity, e.g. 1">
+  <label class="row" style="justify-content:flex-start"><input id="ofr" type="checkbox" checked style="width:22px;height:22px"> Repeat for every full quantity</label>
+  <button class="pri" data-act="addoffer">Add offer</button></div></div>
+  ${S.offers.map(o=>`<div class="card row"><span>${esc(offerText(o))}</span><button class="sm" data-act="deloffer" data-v="${o.id}">Delete</button></div>`).join("")||'<div class="card mute">No offers yet.</div>'}`;
+}
+
+function settingsHTML(){
+  const adm=user.role==="admin",ph=adm?(S.shop.adminTel||""):(user.phone||"");
+  return `<div class="card grid" style="max-width:380px"><b>My phone number</b><input id="mp" type="tel" placeholder="Phone number" value="${esc(ph)}"><button class="pri" data-act="savephone">Save phone</button><div class="mute">Printed as Tel next to Sales Person on your bills.</div></div>`
+  +(adm?`<div class="card grid" style="max-width:380px"><b>Shop details on invoice</b><input id="sa" placeholder="Shop address" value="${esc(shopAd())}"><input id="st" type="tel" placeholder="Shop phone" value="${esc(shopTl())}"><label class="mute">Maximum discount % a rep can give (blank = no limit)</label><input id="sm" type="number" min="0" max="100" placeholder="e.g. 5" value="${esc(S.shop.maxDisc==null?"":S.shop.maxDisc)}"><button class="pri" data-act="saveshop">Save shop details</button></div>`:"")
+  +`<div class="card grid" style="max-width:380px"><b>Change my password</b><input id="op" type="password" placeholder="Current password"><input id="np" type="password" placeholder="New password (min 6)"><input id="np2" type="password" placeholder="Repeat new password"><button class="pri" data-act="chpass">Save password</button></div>`;
+}
+
+function sumHTML(){
+  const F=Object.entries(allFree()),B=SECS.map(s=>[s,totals(s)]).filter(([s,T])=>T.L.length);
+  if(!B.length&&!F.length)return '<span class="mute">No items selected yet. Tap + on an item.</span>';
+  const R=(a,b,bold)=>`<div class="row" style="margin-top:2px">${bold?"<b>"+a+"</b><b>"+b+"</b>":"<span>"+a+"</span><span>"+b+"</span>"}</div>`;
+  let h=B.map(([s,T])=>`<div style="margin-bottom:10px"><b>${s} bill</b><ul class="sel">`+T.L.map(p=>{const q=cart[p.id],g=q*effP(p),l=lineLess(p.id,q,effP(p));return `<li>${p.code?esc(p.code)+" ":""}${esc(p.name)} x ${q} @ ${money(effP(p))}${p.mrp?" (MRP "+fmt(p.mrp)+")":""} = ${money(g)}${l>0?" - "+money(l)+" disc = "+money(g-l):""}</li>`;}).join("")+"</ul>"
+   +R("Gross total",money(T.gross))+(T.idisc?R("Item discounts","- "+money(T.idisc)):"")+(T.less?R("Bill discount "+T.dp+"%","- "+money(T.less)):"")+(T.rt?R("Return amount","- "+money(T.rt)):"")+R("Total value",money(T.total),true)+"</div>").join("");
+  if(B.length>1)h='<div class="mute" style="margin-bottom:6px">FANCY and STATIONERY are saved as 2 separate bills.</div>'+h;
+  if(F.length)h+='<div style="color:var(--ok);margin-top:6px"><b>Free items</b><ul class="sel">'+F.map(([id,q])=>{const p=prodById(id)||{name:id};return `<li>${esc(p.name)} x ${q} FREE (${secOf(p)} bill)</li>`;}).join("")+"</ul></div>";
+  return h;
+}
+
+function plistHTML(){
+  const s=qs.trim().toLowerCase(),list=S.products.filter(p=>secOf(p)===osec&&(!cat||catOf(p)===cat)&&(!s||(p.name+" "+(p.code||"")).toLowerCase().includes(s)));
+  if(!list.length)return '<span class="mute">No items found. Admin can add items in the Stock tab.</span>';
+  const inp=p=>{const q=cart[p.id]||0;return `<div class="step"><button data-act="dec" data-v="${p.id}" ${q?"":"disabled"}>-</button><input type="number" inputmode="numeric" min="0" data-id="${p.id}" data-f="qty" value="${q||""}" placeholder="0" class="${q>avail(p)?"over":""}"><button data-act="inc" data-v="${p.id}" ${avail(p)>0?"":"disabled"}>+</button></div>`;};
+  const price=p=>`Rs ${fmt(p.price)} | MRP ${p.mrp?fmt(p.mrp):"-"}`;
+  const row=p=>`<div class="prod"><div><b>${esc(p.name)}</b>${p.code?` <span class="badge">${esc(p.code)}</span>`:""}<div class="mute">${avail(p)>0?"In stock: "+avail(p)+(p.unit?" "+p.unit:""):"Out of stock"}</div><div class="mute">${price(p)}</div>${offerHint(p)}</div>${inp(p)}</div>`;
+  const cell=p=>`<div class="vc"><b>${esc(varOf(p).v||p.name)}</b>${p.code?`<div class="mute">${esc(p.code)}</div>`:""}<div class="mute">${avail(p)>0?"Stock "+avail(p)+(p.unit?" "+p.unit:""):"Out of stock"}</div><div class="mute">${price(p)}</div>${offerHint(p)}${inp(p)}</div>`;
+  const G=[],ix={};
+  list.forEach(p=>{const c=catOf(p),b=varOf(p).base,k=c+"|"+b.toLowerCase();if(ix[k]==null){ix[k]=G.length;G.push({c,b,L:[]});}G[ix[k]].L.push(p);});
+  let h="",lc="";
+  G.forEach(g=>{
+    if(!cat&&g.c!==lc){h+=`<div class="catb">${esc(g.c)}</div>`;lc=g.c;}
+    h+=g.L.length==1&&!varOf(g.L[0]).v?row(g.L[0]):`<div class="grp2"><b>${esc(g.b)}</b><div class="vgrid">${g.L.map(cell).join("")}</div></div>`;
+  });
+  return h;
+}
+
+function linesHTML(){
+  const L=S.products.filter(p=>cart[p.id]>0),h='<b>Price and discount for each item (optional)</b>';
+  if(!L.length)return h+'<div class="mute">Select items above. Then you can change the price or give a discount to each item here.</div>';
+  return h+'<div class="mute">A price you type here is used only for this bill. The stock price does not change.'+(user.role==="admin"?"":" You can raise the price, not lower it (use discount for that).")+' Discount: type % or Rs, the other fills automatically.</div>'+L.map(p=>{
+    const q=cart[p.id],pp=effP(p),g=q*pp,d=ld[p.id]||{},ls=lineLess(p.id,q,pp),pc=d.s!=="rs",
+      pv=pc?(d.p||""):(ls>0&&g>0?String(+(ls/g*100).toFixed(2)):""),rv=pc?(ls>0?String(+ls.toFixed(2)):""):(d.r||"");
+    return `<div class="prod" data-line="${p.id}"><div style="min-width:150px"><b>${p.code?esc(p.code)+" ":""}${esc(p.name)}</b><div class="mute"><span class="lt">${q} x ${money(pp)} = ${money(g)}</span><span class="lnet">${ls>0?", after discount "+money(g-ls):""}</span></div></div>
+    <div class="three"><input data-f="lpr" data-id="${p.id}" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Price ${fmt(p.price)}" value="${esc(pr[p.id]||"")}"><input data-f="lp" data-id="${p.id}" type="number" inputmode="decimal" min="0" max="100" step="0.01" placeholder="%" value="${esc(pv)}"><input data-f="lr" data-id="${p.id}" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Rs" value="${esc(rv)}"></div></div>`;}).join("");
+}
+function refreshLine(row,id){
+  const p=prodById(id);if(!p||!row)return;
+  const q=cart[id]||0,pp=effP(p),g=q*pp,ls=lineLess(id,q,pp),d=ld[id]||{},o=row.querySelector(d.s==="rs"?'[data-f="lp"]':'[data-f="lr"]');
+  if(o)o.value=d.s==="rs"?(ls>0&&g>0?String(+(ls/g*100).toFixed(2)):""):(ls>0?String(+ls.toFixed(2)):"");
+  row.querySelector(".lt").textContent=q+" x "+money(pp)+" = "+money(g);
+  row.querySelector(".lnet").textContent=ls>0?", after discount "+money(g-ls):"";
+}
+function orderHTML(){
+  const adm=user.role==="admin",cn=c=>sum(S.products.filter(p=>secOf(p)===osec&&catOf(p)===c),p=>cart[p.id]||0),E=Object.entries(freeCart).filter(([k,v])=>v>0);
+  const chip=(v,l,n)=>`<button class="chip ${cat===v?"on":""}" data-act="cat" data-v="${esc(v)}">${esc(l)}${n?`<i>${n}</i>`:""}</button>`;
+  return `<div class="card"><div class="grid" style="margin:0"><input data-f="shop" list="shl" placeholder="Customer / shop name" value="${esc(shopName)}"><datalist id="shl">${[...new Set(S.orders.map(o=>o.shop))].sort().map(x=>`<option value="${esc(x)}">`).join("")}</datalist><input data-f="addr" placeholder="Address (optional)" value="${esc(shopAddr)}"><input data-f="tel" type="tel" placeholder="Mobile number (optional)" value="${esc(shopTel)}">
+  ${adm?`<select data-f="brep"><option value="">Bill by: Admin</option>${S.refs.map(r=>`<option value="${esc(r.uid)}" ${brep==r.uid?"selected":""}>Bill for rep: ${esc(r.name)}</option>`).join("")}</select>`:""}</div>
+  <div class="chips">${SECS.map(x=>{const n=sum(S.products.filter(p=>secOf(p)===x),p=>cart[p.id]||0);return `<button class="chip ${osec===x?"on":""}" data-act="sec" data-v="${x}">${x}${n?`<i>${n}</i>`:""}</button>`;}).join("")}</div><div class="chips">${chip("","All "+osec,0)}${cats(osec).map(c=>chip(c,c,cn(c))).join("")}</div>
+  <input data-f="qs" placeholder="Search item" value="${esc(qs)}"></div>
+  <div class="card" id="plist">${plistHTML()}</div>
+  <div class="card"><b>Add free items (optional)</b><div class="mute">Not charged, but stock is reduced.</div><div class="grid">
+  <select id="fsel" data-f="fsel">${S.products.map(p=>`<option value="${p.id}" ${lastFree==p.id?"selected":""}>${secOf(p)}: ${esc(p.name)} (stock ${p.stock})</option>`).join("")}</select>
+  <div class="row"><input id="fqty" type="number" inputmode="numeric" min="1" placeholder="Free quantity" style="flex:1"><button data-act="addfree">Add free</button></div></div>
+  ${E.map(([id,q])=>`<div class="row" style="margin-top:8px"><span>${esc((prodById(id)||{name:id}).name)} x ${q} FREE</span><button class="sm" data-act="rmfree" data-v="${id}">Remove</button></div>`).join("")}</div>
+  <div class="card" id="lines">${linesHTML()}</div>
+  <div class="card"><b>Bill discount / Return / Payment</b><div class="mute">Extra discount on the whole bill (after item discounts). Type % or Rs, the other fills automatically.</div>${SECS.map(x=>`<div class="mute" style="margin-top:8px">${x} bill</div><div class="two"><input data-f="disc" data-sec="${x}" type="number" inputmode="decimal" min="0" max="100" step="0.01" placeholder="Discount %" value="${esc(disc[x])}"><input data-f="dRs" data-sec="${x}" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Discount (Rs)" value="${esc(dRs[x])}"></div><input data-f="ret" data-sec="${x}" style="margin-top:8px" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Return amount (Rs)" value="${esc(ret[x])}">`).join("")}${user.role!=="admin"&&S.shop.maxDisc!=null?`<div class="mute" style="margin-top:6px">You can give up to ${S.shop.maxDisc}% discount.</div>`:""}<label class="mute" style="display:block;margin-top:10px">Payment</label><select data-f="pay">${PAY.map(x=>`<option ${pay==x?"selected":""}>${x}</option>`).join("")}</select><label class="mute" style="display:block;margin-top:10px">Remark (optional)</label><input data-f="remark" placeholder="Remark for this bill" value="${esc(remark)}"></div>
+  <div class="card" id="sum">${sumHTML()}</div><div class="bar"><div><span id="tot"></span><button class="pri" data-act="submit">Save bill</button></div></div>`;
+}
+
+function updateTot(){
+  const el=$("#tot");if(!el)return;syncDisc();
+  el.innerHTML=`<b>${money(sum(SECS,s=>totals(s).total))}</b> <span class="mute">${sum(S.products,p=>cart[p.id]||0)} pcs</span>`;
+}
+
+function render(force){
+  const app=$("#app");
+  if(!FIREBASE_CONFIG){app.innerHTML=`<div class="card login"><h2 style="margin:0">${NAME}</h2>`+note("Setup needed: paste your Firebase config into FIREBASE_CONFIG at the top of the script in index.html.","err")+"</div>";return;}
+  if(!ready){app.innerHTML='<div class="card login mute">Loading...</div>';return;}
+  const ae=document.activeElement;
+  if(!force&&ae&&/INPUT|SELECT|TEXTAREA/.test(ae.tagName)&&app.contains(ae))return;
+  if(!user){app.innerHTML=loginHTML();return;}
+  const adm=user.role==="admin";
+  const tabs=adm?[["order","New bill"],["stock","Stock"],["bills","Bills"],["reps","Reps"],["offers","Offers"],["settings","Settings"]]:[["order","New bill"],["bills","My bills"],["settings","Settings"]];
+  app.innerHTML=`<header><b>${NAME}</b><span class="mute">${adm?"Admin":esc(user.name)}</span><button class="sm" data-act="logout">Log out</button></header>`+offBanner()
+   +(adm?statsHTML():"")+`<nav>${tabs.map(([k,l])=>`<button class="${tab===k?"on":""}" data-act="tab" data-v="${k}">${l}</button>`).join("")}</nav>`+msg
+   +(tab=="edit"?editHTML():tab=="stock"?stockHTML():tab=="bills"?billsHTML():tab=="reps"?repsHTML():tab=="offers"?offersHTML():tab=="settings"?settingsHTML():orderHTML());
+  updateTot();
+}
+
+/* ===== DATABASE ===== */
+function listenErr(e){
+  if(e.code==="permission-denied"&&user&&user.role==="rep"){loginErr="Your access was removed. Contact the admin.";auth.signOut();return;}
+  msg=note("Connection problem: "+e.message,"err");render(true);
+}
+function startListening(){
+  const adm=user.role==="admin";
+  unsubs.push(db.collection("products").onSnapshot(s=>{S.products=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>secOf(a).localeCompare(secOf(b))||catOf(a).localeCompare(catOf(b))||(a.ord||0)-(b.ord||0)||a.name.localeCompare(b.name,undefined,{numeric:true}));render();if(draftSy&&S.products.length){const y=draftSy;draftSy=0;setTimeout(()=>scrollTo(0,y),60);}},listenErr));
+  unsubs.push(db.collection("offers").onSnapshot(s=>{S.offers=s.docs.map(d=>({id:d.id,...d.data()}));render();},listenErr));
+  unsubs.push(db.doc("meta/setup").onSnapshot(d=>{S.setup=d.exists?d.data():{};render();},()=>{}));
+  unsubs.push(db.doc("meta/shop").onSnapshot(d=>{S.shop=d.exists?d.data():{};render();},()=>{}));
+  const q=adm?db.collection("orders").orderBy("time","desc").limit(500):db.collection("orders").where("repId","==",user.uid).limit(1000);
+  unsubs.push(q.onSnapshot(s=>{S.orders=s.docs.map(d=>d.data()).sort((a,b)=>b.time-a.time);render();},listenErr));
+  if(adm)unsubs.push(db.collection("refs").onSnapshot(s=>{S.refs=s.docs.map(d=>({uid:d.id,...d.data()})).sort((a,b)=>a.name.localeCompare(b.name));render();},listenErr));
+}
+
+/* ===== ACTIONS ===== */
+async function login(){
+  loginErr="";const pw=$("#lp").value.trim(),email=lrole=="admin"?ADMIN_EMAIL:$("#ln").value.trim().toLowerCase()+DOMAIN;
+  try{await auth.signInWithEmailAndPassword(email,pw);}
+  catch(e){const el=$("#lerr");el.style.display="";el.textContent=e.code=="auth/network-request-failed"?"No internet connection.":lrole=="admin"?"Wrong admin password.":"Wrong Rep ID or password. Ask the admin to create your login.";}
+}
+
+async function submitOrder(){
+  const rr=user.role==="admin"&&brep?S.refs.find(x=>x.uid===brep):null;
+  const who=user.role==="admin"?(rr?{id:rr.uid,name:rr.name,tel:rr.phone||""}:{id:"admin",name:"Admin",tel:S.shop.adminTel||""}):{id:user.uid,name:user.name,tel:user.phone||""};
+  const shop=shopName.trim(),lines=Object.entries(cart).filter(([k,v])=>v>0&&prodById(k));
+  if(!shop){msg=note("Enter the shop name.","err");render(true);return;}
+  if(!lines.length){msg=note("Add at least one item quantity.","err");render(true);return;}
+  if(user.role!=="admin"&&S.shop.maxDisc!=null&&SECS.some(x=>{const T=totals(x);return T.gross>0&&T.all/T.gross*100>S.shop.maxDisc+0.001;})){msg=note("Discount is more than your limit ("+S.shop.maxDisc+"%). Reduce the discount.","err");render(true);return;}
+  const fr=allFree(),need={};
+  lines.forEach(([id,q])=>{need[id]=(need[id]||0)+q;});
+  Object.entries(fr).forEach(([id,q])=>{need[id]=(need[id]||0)+q;});
+  const prMap={};lines.forEach(([id])=>{const p=prodById(id);if(p&&effP(p)!==p.price)prMap[id]=effP(p);});
+  if(user.role!=="admin"&&Object.keys(prMap).some(id=>prMap[id]<prodById(id).price-0.0001)){msg=note("You cannot bill below the item price. Use discount for a lower price.","err");render(true);return;}
+  const snap={};Object.keys(need).forEach(id=>{const p=prodById(id);if(p)snap[id]={name:p.name,price:p.price,mrp:p.mrp||0,code:p.code||"",sec:secOf(p)};});
+  const pl={time:Date.now(),shop,addr:shopAddr.trim(),tel:shopTel.trim(),who,lines,fr,need,snap,ret:{...ret},st:{disc:{...disc},dRs:{...dRs},dsrc:{...dsrc}},ldm:JSON.parse(JSON.stringify(ld)),pr:prMap,pay,remark:remark.trim()};
+  const done=()=>{cart={};freeCart={};shopName=shopAddr=shopTel="";disc={FANCY:"",STATIONERY:""};ret={FANCY:"",STATIONERY:""};dRs={FANCY:"",STATIONERY:""};dsrc={FANCY:"pct",STATIONERY:"pct"};pay="Cash";ld={};pr={};remark="";tab="bills";saveDraftNow();};
+  const lack=Object.keys(need).filter(id=>{const p=prodById(id);return !p||avail(p)<need[id];});
+  if(!navigator.onLine){
+    if(lack.length){msg=note("Not enough stock: "+lack.map(id=>{const p=prodById(id);return (p?p.name:id)+" (only "+(p?avail(p):0)+")";}).join(" | "),"err");render(true);return;}
+    queueBill(pl,done);return;
+  }
+  if(getQ().length)await syncQueue();
+  try{
+    const r=await saveBillTx(pl);
+    if(r.bad)msg=note("Not enough stock. "+r.bad.join(" | "),"err");
+    else{msg=`<div class="note ok">`+r.ok.map(id=>`Bill #${id} saved. <button class="sm" data-act="print" data-v="${id}">Print invoice</button> <button class="sm" data-act="wa" data-v="${id}">WhatsApp</button>`).join("<br>")+`</div>`;done();}
+  }catch(e){
+    if(netErr(e)&&!lack.length){queueBill(pl,done);return;}
+    msg=note("Could not save the bill: "+e.message,"err");
+  }
+  render(true);
+}
+
+function openCancel(id){
+  const o=S.orders.find(x=>x.id===id);if(!o)return;
+  $("#dlg").innerHTML=`<h3 style="margin-top:0">Cancel bill #${o.id}</h3>
+  <label class="mute">Reason</label><select id="cr">${REASONS.map(r=>`<option>${r}</option>`).join("")}</select>
+  <label class="mute">Note (optional)</label><input id="cn">
+  <p class="mute">How many pieces came back in good condition? The rest count as lost / damaged.</p>
+  ${o.items.map((it,i)=>`<div class="row" style="margin:4px 0"><span>${esc(it.name)}${it.free?" (FREE)":""} (billed ${it.qty})</span><input type="number" min="0" max="${it.qty}" value="${it.qty}" data-back="${i}" style="width:80px"></div>`).join("")}
+  <div class="row" style="margin-top:12px"><button data-act="close">Keep bill</button><button class="pri" data-act="docancel" data-v="${o.id}">Cancel bill</button></div>`;
+  $("#dlg").showModal();
+}
+
+async function doCancel(id){
+  const backs=[...document.querySelectorAll("[data-back]")].map(i=>Math.floor(+i.value||0)),reason=$("#cr").value,nt=$("#cn").value.trim();
+  try{
+    await db.runTransaction(async t=>{
+      const oref=db.doc("orders/"+id),os=await t.get(oref);
+      if(!os.exists||os.data().status!=="active")return;
+      const o=os.data(),back={};
+      o.items.forEach((it,i)=>{const b=Math.min(it.qty,Math.max(0,backs[i]||0));it.back=b;back[it.pid]=(back[it.pid]||0)+b;});
+      const ids=Object.keys(back),ps=await Promise.all(ids.map(pid=>t.get(db.doc("products/"+pid))));
+      ps.forEach((sn,i)=>{if(sn.exists&&back[ids[i]]>0)t.update(sn.ref,{stock:sn.data().stock+back[ids[i]]});});
+      t.update(oref,{status:"cancelled",reason,note:nt,by:user.role==="admin"?"Admin":user.name,items:o.items,lost:sum(o.items,i=>(i.qty-i.back)*i.price)});
+    });
+    msg=note("Bill #"+id+" cancelled. Stock updated.","ok");
+  }catch(e){msg=note("Could not cancel: "+e.message,"err");}
+  $("#dlg").close();render(true);
+}
+
+async function addProduct(){
+  if(needNet())return;
+  const c=$("#pc").value.trim(),n=$("#pn").value.trim(),sc=$("#psec").value,vs=$("#pv").value.split(",").map(x=>x.trim()).filter(Boolean);
+  if(!c||!n){msg=note("Enter the category and item name.","err");render(true);return;}
+  const names=vs.length?vs.map(v=>n+" "+v):[n],have=new Set(S.products.filter(p=>secOf(p)===sc).map(p=>p.name.toLowerCase())),nw=names.filter(x=>!have.has(x.toLowerCase()));
+  if(!nw.length){msg=note("These items already exist.","err");render(true);return;}
+  const base={cat:c.toUpperCase(),sec:sc,stock:Math.max(0,Math.floor(+$("#ps").value||0)),cost:+$("#pk").value||0,price:+$("#pb").value||0,mrp:+$("#pm").value||0},t0=Date.now(),mx=maxCode(sc),codes=[];
+  try{
+    const r=db.doc("meta/codes");
+    await db.runTransaction(async t=>{
+      const d=await t.get(r),cd=d.exists?d.data():{};let num=Math.max(cd[sc]||0,mx);codes.length=0;
+      nw.forEach((x,i)=>{num++;const code=CODEP[sc]+String(num).padStart(2,"0");codes.push(code);t.set(db.doc("products/i"+t0.toString(36)+i),{...base,id:"i"+t0.toString(36)+i,name:x,code});});
+      t.set(r,{...cd,[sc]:num});
+    });
+    msg=note("Added "+nw.length+" item(s), codes "+codes[0]+(codes.length>1?" to "+codes[codes.length-1]:"")+"."+(nw.length<names.length?" Skipped (already exist): "+(names.length-nw.length):""),"ok");
+  }catch(e){msg=note("Could not add: "+e.message,"err");}
+  render(true);
+}
+
+async function addOffer(){
+  const b=$("#ofb").value,f=$("#off").value,n=Math.floor(+$("#ofn").value),m=Math.floor(+$("#ofm").value);
+  if(!(n>0)||!(m>0)){msg=note("Enter the quantity needed and the free quantity.","err");render(true);return;}
+  try{await db.collection("offers").add({buyPid:b,freePid:f,n,m,repeat:$("#ofr").checked,created:Date.now()});msg=note("Offer added.","ok");}catch(e){msg=note(e.message,"err");}
+  render(true);
+}
+
+async function addRep(){
+  const n=$("#rn").value.trim(),id=$("#ri").value.trim().toLowerCase(),p=$("#rp").value.trim(),ph=$("#rt").value.trim();
+  if(!n||!id||!p){msg=note("Enter the rep name, ID and password.","err");render(true);return;}
+  if(!/^[a-z0-9._-]+$/.test(id)){msg=note("Rep ID can use only letters, numbers, dot, dash and underscore.","err");render(true);return;}
+  if(p.length<6){msg=note("Password must be at least 6 characters.","err");render(true);return;}
+  try{
+    let uid;
+    try{uid=(await auth2.createUserWithEmailAndPassword(id+DOMAIN,p)).user.uid;}
+    catch(e){
+      if(e.code!=="auth/email-already-in-use")throw e;
+      try{uid=(await auth2.signInWithEmailAndPassword(id+DOMAIN,p)).user.uid;}catch(e2){throw new Error("That Rep ID already exists with a different password. Use a new Rep ID.");}
+    }
+    await db.doc("refs/"+uid).set({id,name:n,phone:ph});
+    msg=note("Rep "+n+" is ready. Login ID: "+id,"ok");
+  }catch(e){msg=note(e.message,"err");}
+  try{await auth2.signOut();}catch(e){}
+  render(true);
+}
+
+async function changePass(){
+  const o=$("#op").value,n=$("#np").value.trim(),n2=$("#np2").value.trim();
+  if(n.length<6){msg=note("New password must be at least 6 characters.","err");render(true);return;}
+  if(n!==n2){msg=note("The two new passwords do not match.","err");render(true);return;}
+  try{const u=auth.currentUser;await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email,o));await u.updatePassword(n);msg=note("Password changed.","ok");}
+  catch(e){msg=note(/credential|password/.test(e.code||"")?"Current password is wrong.":e.message,"err");}
+  render(true);
+}
+
+/* ===== INVOICE / WHATSAPP ===== */
+const invNo=o=>o.off?"OFF-"+String(o.offNo).padStart(4,"0")+"-"+(PRE[o.sec]||"TT"):(PRE[o.sec]||"TT")+"/"+String(o.inv||o.id).padStart(5,"0");
+function grouped(o){const g={};o.items.forEach(i=>{const k=g[i.pid]=g[i.pid]||{name:i.name,price:null,q:0,f:0,mrp:mrpOf(i),d:0,code:i.code||(prodById(i.pid)||{}).code||""};if(i.free)k.f+=i.qty;else{k.q+=i.qty;k.price=i.price;k.d+=i.disc||0;}});return Object.values(g);}
+function printBill(id){
+  const o=findOrder(id);if(!o){msg=note("Bill not found. Try again in a moment.","err");render(true);return;}
+  const H=HEAD[o.sec]||HEAD.FANCY,bal=due(o),L=(a,b)=>`<div style="display:flex;justify-content:space-between;margin:2px 0"><span>${a}</span><span>${b}</span></div>`;
+  $("#printArea").innerHTML=`<h1>${esc(H.t)}</h1>${H.s?`<div class="c"><i>${esc(H.s)}</i></div>`:""}<div class="c"><b>Sales Invoice</b></div>${H.d?`<div class="c">${esc(H.d)}</div>`:""}<div class="c">${esc(shopAd())}</div><div class="c">Tel: ${esc(shopTl())}</div>
+  ${o.status=="cancelled"?`<div class="stamp">CANCELLED${o.reason?" - "+esc(o.reason):""}</div>`:""}
+  <div style="display:flex;justify-content:space-between;gap:10px;margin:12px 0 6px"><div style="width:50%"><div>Customer: <b>${esc(o.shop)}</b></div><div>Address: ${esc(o.addr||"-")}</div><div>Mobile: ${esc(o.tel||"-")}</div></div>
+  <div style="width:50%">${L("Invoice No",": "+invNo(o))}${L("Date / Time",": "+new Date(o.time).toLocaleString())}${L("Sales Person",": "+esc(o.rep))}${L("Telephone",": "+esc(o.repTel||""))}</div></div>
+  <table><thead><tr><th>No</th><th>Code</th><th>Name</th><th class="r">Rate</th><th class="r">Qty</th><th class="r">Disc</th><th class="r">Total</th><th class="r">MRP</th></tr></thead><tbody>${o.items.map((i,n)=>`<tr><td>${n+1}</td><td>${esc(i.code||(prodById(i.pid)||{}).code||"")}</td><td>${esc(i.name)}</td><td class="r">${i.free?"FREE":fmt(i.price)}</td><td class="r">${i.qty}</td><td class="r">${i.disc?fmt(i.disc):"-"}</td><td class="r">${fmt(i.qty*i.price-(i.disc||0))}</td><td class="r">${mrpOf(i)?fmt(mrpOf(i)):"-"}</td></tr>`).join("")}</tbody></table>
+  <div style="width:55%;margin-left:auto">${L("Gross Total",fmt(o.gross))}${o.idisc?L("Item Discounts",fmt(o.idisc)):""}${o.less?L("Bill Discount"+(o.discPct?" "+fmt(o.discPct)+"%":""),fmt(o.less)):""}${o.ret?L("Return Amount",fmt(o.ret)):""}<div style="border-top:2px solid #000;margin-top:4px;padding-top:3px;font-weight:bold;font-size:15px">${L("Total Value","Rs "+fmt(o.total))}</div>${o.pay?L("Payment",esc(o.pay)):""}${bal>0?L("Paid",fmt(o.paid||0))+L("Balance due",fmt(bal)):""}</div>
+  ${o.remark?`<div style="margin-top:10px">Remark: ${esc(o.remark)}</div>`:""}
+  <div class="c" style="margin-top:16px"><b>Please do not make any payments without the original invoice</b></div>
+  <div style="margin-top:36px;width:45%;border-top:1px solid #000;padding-top:2px">Customer Signature</div>`;
+  setTimeout(()=>window.print(),80);
+}
+function shareWA(id){
+  const o=findOrder(id);if(!o){msg=note("Bill not found. Try again in a moment.","err");render(true);return;}
+  let t=(o.status=="cancelled"?"*CANCELLED*\n":"")+"*"+(HEAD[o.sec]||HEAD.FANCY).t+"*\nSales Invoice\nInvoice No: "+invNo(o)+"\nDate: "+new Date(o.time).toLocaleString()+"\nShop: "+o.shop+"\nSales Person: "+o.rep+"\n------------------\n";
+  grouped(o).forEach(k=>{t+=(k.code?k.code+" ":"")+k.name+"\n   "+k.q+(k.f?" + "+k.f+" free":"")+" x "+(k.price==null?"-":fmt(k.price))+" = "+fmt(k.q*(k.price||0)-(k.d||0))+(k.d?" (disc "+fmt(k.d)+")":"")+"\n";});
+  t+="------------------\nGross: "+fmt(o.gross)+"\n"+(o.ret?"Return: "+fmt(o.ret)+"\n":"")+(o.idisc?"Item discounts: "+fmt(o.idisc)+"\n":"")+(o.less?"Bill discount "+fmt(o.discPct)+"%: "+fmt(o.less)+"\n":"")+"*TOTAL: Rs "+fmt(o.total)+"*"+(o.paid!=null?"\nPayment: "+(o.pay||"Cash")+(due(o)>0?" (Balance Rs "+fmt(due(o))+")":""):"")+(o.remark?"\nRemark: "+o.remark:"")+"\nTEL: "+shopTl()+"\nPlease do not make any payments without the original invoice.";
+  let d=String(o.tel||"").replace(/\D/g,"");if(d.startsWith("0")&&d.length==10)d="94"+d.slice(1);
+  window.open("https://wa.me/"+d+"?text="+encodeURIComponent(t),"_blank");
+}
+
+function stockRows(){
+  const q=sq.trim().toLowerCase();let h="",last="",lb="";const cnt={};
+  const L=S.products.filter(p=>(!q||(p.name+" "+catOf(p)+" "+(p.code||"")).toLowerCase().includes(q))&&(sf=="all"||(sf=="out"?p.stock==0:p.stock<=10)));
+  L.forEach(p=>{const k=catOf(p)+"|"+varOf(p).base.toLowerCase();cnt[k]=(cnt[k]||0)+1;});
+  L.forEach(p=>{
+    const gk=secOf(p)+" / "+catOf(p);if(gk!==last){h+=`<tr class="grp"><td colspan="8">${esc(gk)}</td></tr>`;last=gk;lb="";}
+    const b=varOf(p).base,k=catOf(p)+"|"+b.toLowerCase();if(k!==lb){if(cnt[k]>1)h+=`<tr class="sub"><td colspan="8">${esc(b)}</td></tr>`;lb=k;}
+    const cl=p.stock==0?"zero":p.stock<=10?"low":"",I=(f,v,x)=>`<td><input type="number" min="0" step="0.01" data-id="${p.id}" data-f="${f}" value="${v}" ${x||""}></td>`;
+    h+=`<tr><td>${esc(p.code||"-")}</td><td>${esc(p.name)}${p.unit?` <span class="mute">(${esc(p.unit)})</span>`:""}</td>${I("stock",p.stock,`class="${cl}"`)}<td><input type="number" min="0" placeholder="+ qty" data-id="${p.id}" data-f="add"></td>${I("cost",p.cost)}${I("price",p.price)}${I("mrp",p.mrp)}
+    <td style="white-space:nowrap"><button class="sm" data-act="edit" data-v="${p.id}">Edit</button> <button class="sm" data-act="delprod" data-v="${p.id}">Delete</button></td></tr>`;
+  });
+  return h||'<tr><td colspan="8" class="mute">No items found.</td></tr>';
+}
+function billList(){
+  const q=bq.trim().toLowerCase(),d0=new Date(),t0=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()).getTime(),y0=t0-864e5,m0=new Date(d0.getFullYear(),d0.getMonth(),1).getTime();
+  let L=S.orders.filter(o=>(!q||(o.shop+" "+o.rep+" "+invNo(o)+" "+o.id+" "+(o.remark||"")).toLowerCase().includes(q))&&(bf=="all"||(bf=="today"?o.time>=t0:bf=="yest"?(o.time>=y0&&o.time<t0):bf=="month"?o.time>=m0:bf=="due"?due(o)>0:o.status=="cancelled")));
+  const latest=S.orders.length?Math.max(...S.orders.map(o=>o.time)):0;
+  L=L.slice().sort((a,b)=>bsort=="old"?a.time-b.time:b.time-a.time).slice(0,300);
+  const off=(!q&&(bf=="all"||bf=="today"))?offHTML():"";if(!L.length&&!off)return '<div class="card mute">No bills found.</div>';
+  const dl=t=>{const d=new Date(t),k=new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime();return k===t0?"Today":k===y0?"Yesterday":d.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short",year:"numeric"});};
+  let h="",last="";
+  L.forEach(o=>{
+    const dk=dl(o.time);if(dk!==last){h+=`<div class="catb">${esc(dk)}</div>`;last=dk;}
+    const d=due(o),tm=new Date(o.time).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),dsc=Math.round(((o.idisc||0)+(o.less||0))*100)/100;
+    h+=`<div class="card bill ${o.status}">
+    <div class="row"><b>Bill #${o.id} - ${invNo(o)}${o.sec?" ("+o.sec+")":""}</b>${o.offNo?` <span class="mute">(was OFF-${String(o.offNo).padStart(4,"0")})</span>`:""}<span>${o.time===latest?'<span class="badge" style="background:var(--ok);color:#fff;border-color:var(--ok)">LATEST</span> ':""}${o.edited?'<span class="badge">EDITED</span> ':""}<span class="badge">${o.status=="cancelled"?"Cancelled":d>0?"DUE "+money(d):"Paid"}</span></span></div>
+    <div class="mute">${tm}, Rep: ${esc(o.rep)}, Customer: ${esc(o.shop)}${o.pay?", "+o.pay:""}</div>
+    <ul class="sel">${o.items.map(i=>`<li>${i.code?esc(i.code)+" ":""}${esc(i.name)} x ${i.qty} ${i.free?'<b style="color:var(--ok)">FREE</b>':"@ "+money(i.price)+(mrpOf(i)?" (MRP "+fmt(mrpOf(i))+")":"")+(i.disc?" - disc "+money(i.disc):"")+" = "+money(i.qty*i.price-(i.disc||0))}</li>`).join("")}</ul>
+    <div class="row"><b>${money(o.total)}</b><span><button class="sm" data-act="print" data-v="${o.id}">Print invoice</button> <button class="sm" data-act="wa" data-v="${o.id}">WhatsApp</button> ${d>0?`<button class="sm" data-act="pay" data-v="${o.id}">Add payment</button> `:""}${o.status=="active"&&user.role==="admin"?`<button class="sm" data-act="editbill" data-v="${o.id}">Edit bill</button> `:""}${o.status=="active"?`<button class="sm" data-act="cancel" data-v="${o.id}">Cancel bill</button>`:""}</span></div>
+    ${(dsc||o.ret)?`<div class="mute">Gross ${money(o.gross)}, Discount ${money(dsc)}, Return ${money(o.ret||0)}</div>`:""}
+    ${o.remark?`<div class="mute">Remark: ${esc(o.remark)}</div>`:""}
+    ${o.status=="cancelled"?`<div class="mute">Reason: ${esc(o.reason)}${o.note?" - "+esc(o.note):""}<br>Returned to stock: ${sum(o.items,i=>i.back||0)} pcs. Lost / damaged: ${money(o.lost)}</div>`:""}
+  </div>`;});
+  return off+h;
+}
+const IMPORT=[["TAPE","Binding tape","Red",72,"pc",0,0],["TAPE","Binding tape","Green",36,"pc",0,0],["TAPE","Binding tape","Black",72,"pc",0,0],["TAPE","Binding tape","Blue",72,"pc",0,0],["TAPE","Masking tape","",205,"",0,0],["TAPE","Wiring tape","Pack",12,"pack",0,0],["TAPE","Wiring tape","Pc",7,"pc",0,0],["TAPE","Sponge tape","1 inch",197,"",0,0],["TAPE","Sponge tape","2 inch",55,"pc",0,0],["TAPE","Clear tape","80M",24,"pc",0,0],["TAPE","Clear tape","200M",18,"pc",0,0],["TAPE","Clear tape","500M",2,"pc",0,0],["TAPE","Tan tape","50M",1,"pc",0,0],["TAPE","Tan tape","80M",21,"pc",0,0],["TAPE","Tan tape","200M",18,"pc",0,0],["TAPE","Cello tape","1 inch 50M",18,"pc",0,0],["TAPE","Cello tape","2 inch 25M",7,"pc",0,0],["ERASER","Eraser","",29,"",308.75,410],["ERASER","White board eraser","",3,"",64.4,85],["ERASER","Animal eraser","",24,"",550,750],["ERASER","Fruit eraser","",34,"",509,750],["RULER","Steel ruler","",306,"pc",92.41,125],["RULER","Ruler","15 cm",304,"pc",18.82,25],["RULER","Ruler","30 cm",246,"",45,60],["PENCIL","Fancy pencil","",162,"box",247.2,330],["PENCIL","Bottle pencil","",12,"",3000,4000],["PENCIL","Pencil sharpener","",0,"",0,0],["PENCIL","Colour pencil","5 pack",9,"pc",312,420],["TIFFEX","Tiffex","Pen",20,"box",0,0],["TIFFEX","Tiffex","Bottle",25,"",98.97,130],["MARKER","Highlighter","Purple",12,"",95.79,125],["MARKER","Highlighter","Blue",12,"",95.79,125],["MARKER","Highlighter","Orange",12,"",95.79,125],["MARKER","Highlighter","Pink",2,"",95.79,125],["MARKER","Highlighter","Green",8,"",95.79,125],["MARKER","CD marker","",22,"",830.1,1100],["FILE","FC file","Green",5,"",1034.52,1320],["FILE","FC file","White",4,"",1034.52,1320],["FILE","FC file","Blue",4,"",1034.52,1320],["FILE","FC file","Grey",6,"",1034.52,1320],["FILE","FC file","Red",3,"",1034.52,1320],["FILE","FC file","Black",3,"",1034.52,1320],["FILE","FC file","Pink",5,"",1034.52,1320],["FILE","FC file","Orange",6,"",1034.52,1320],["FILE","FC file","Yellow",3,"",1034.52,1320],["FILE","File A4","Red",4,"",862.8,1080],["FILE","File A4","Pink",2,"",862.8,1080],["FILE","File A4","Black",7,"",862.8,1080],["FILE","File A4","Light blue",3,"",862.8,1080],["FILE","File A4","Orange",2,"",862.8,1080],["FILE","File A4","Green",4,"",862.8,1080],["FILE","File A4","Grey",4,"",862.8,1080],["FILE","File A4","Yellow",1,"",862.8,1080],["STICKER","Name sticker","Cinderella",4,"",177.19,250],["STICKER","Name sticker","Dora",4,"",177.19,250],["STICKER","Name sticker","Cartoon",4,"",177.19,250],["STICKER","Name sticker","Car",15,"",177.19,250],["STICKER","Name sticker","Spiderman",6,"",177.19,250],["STICKER","Name sticker","Cartoon bear",10,"",177.19,250],["STICKER","Name sticker","Lovely cat",10,"",177.19,250],["STICKER","Name sticker","Butterfly",1,"",177.19,250],["OFFICE","Bill book","",10,"pc",200,260],["OFFICE","Note book","",70,"pc",0,0],["OFFICE","Paper tray","",200,"pack",87.72,120],["OFFICE","Rubber band","",100,"pack",0,0],["OFFICE","Calculator","",40,"",736.81,980],["STAPLER","Stapler clip","Large",7,"",574.7,750],["STAPLER","Stapler clip","Small",0,"",350.5,450],["STAPLER","Stapler","DL0127",72,"pc",0,0],["STAPLER","Stapler","DL0397",54,"pc",0,0],["STAPLER","Stapler","DL0207",3,"pc",0,0],["PIN","Push pin","",12,"",0,0],["PIN","Square pin","",0,"",0,0],["PIN","Office pin","",25,"",0,0],["PIN","Multi colour pin","",20,"box",0,0],["PIN","White pin","",20,"box",0,0],["PIN","Paper fastener","",9,"",0,0],["CRAFT","Glue gun","",24,"pc",630,840],["CRAFT","Pastels","6 colour",10,"pc",75.6,100],["CRAFT","Water colour","",35,"",213.15,285],["CRAFT","Bucket clay","Big",113,"",316.9,420],["CRAFT","IC stick","Colour",0,"",0,0],["CRAFT","IC stick","Normal",0,"",0,0],["PAPER","Bristol board","",0,"",0,0],["PAPER","Bristol board","Blue",68,"",0,0],["PAPER","Bristol board","Green",5,"",0,0],["PAPER","Bristol board","Pink",95,"",0,0],["PAPER","Colour paper 75 GSM","Black",22,"",0,0],["PAPER","Colour paper 80 GSM","",19,"",0,0],["PAPER","Colour paper 80 GSM","Orange",14,"",0,0],["PAPER","Colour paper 80 GSM","Brown",10,"",0,0],["ENVELOPE","Envelope","Small",6850,"",1.61,3],["ENVELOPE","Envelope","Big",4800,"",3.56,5],["ENVELOPE","Envelope","A4",350,"",10.64,15],["CUTTING","Scissors","",150,"",85.05,115],["CUTTING","Scissors","Small",48,"pc",86.6,115],["CUTTING","Cutter","Box",32,"",1080,1440],["CUTTING","Cutter","Pc",69,"",0,0],["SCHOOL","Marshal mathematical box","",40,"pc",270,400],["SCHOOL","Sri Lanka map","",8,"pack",300.01,400],["COVER","My clear bag","White",10,"pack",689.64,900],["COVER","My clear bag","Yellow",3,"pack",689.64,900],["COVER","IC cover","",6,"pack",0,0],["COVER","A5 cover","",28,"",143.33,190],["OTHER","Key tag","",750,"",22.27,30],["OTHER","Madakkai","",150,"",0,0],["LEXA","Lexa clear glue","25 ml",6,"",38.51,50],["LEXA","Lexa clear glue","100 ml",24,"pc",99.33,130],["LEXA","Lexa multi colour sheet","80 GSM",34,"",0,0],["LEXA","Lexa fancy HB pencil","",105,"",315,420]];
+const stockSummary=()=>{const m={};S.products.forEach(p=>{const k=catOf(p);m[k]=(m[k]||0)+1;});return S.products.length+" items - "+Object.entries(m).sort().map(([k,n])=>k+" "+n).join(", ")+" | Stock value: "+money(sum(S.products,p=>p.stock*p.price))+" (Ex Dealer), "+money(sum(S.products,p=>p.stock*p.mrp))+" (MRP)";};
+function importCard(){
+  if(user.role!=="admin"||(S.setup||{}).stock1)return "";
+  return `<div class="card"><b>Load starting stock list</b><div class="mute">Loads ${IMPORT.length} items (tapes, files, pencils, stickers, Lexa items and more) with your quantities, codes ${CODEP.FANCY}01 onwards and the prices from your price list (tape, colour sheet and multi colour sheet prices are left empty). This DELETES all current stock items first. Bills are kept.</div><p><button class="pri" data-act="importstock">Load ${IMPORT.length} items</button></p></div>`;
+}
+async function importStock(){
+  if(needNet())return;
+  if(!confirm("This will DELETE all current stock items and offers, then load "+IMPORT.length+" new items. Bills are kept. Continue?"))return;
+  try{
+    const old=[...(await db.collection("products").get()).docs,...(await db.collection("offers").get()).docs];
+    for(let i=0;i<old.length;i+=400){const b=db.batch();old.slice(i,i+400).forEach(d=>b.delete(d.ref));await b.commit();}
+    const t0=Date.now().toString(36);
+    for(let i=0;i<IMPORT.length;i+=40){
+      const b=db.batch();
+      IMPORT.slice(i,i+40).forEach(([c,base,v,q,u,pr,mp],j)=>{const k=i+j,id="f"+t0+"_"+k;b.set(db.doc("products/"+id),{id,sec:"FANCY",cat:c,base,var:v,name:v?base+" "+v:base,unit:u,stock:q,cost:0,price:pr||0,mrp:mp||0,ord:k+1,code:CODEP.FANCY+String(k+1).padStart(2,"0")});});
+      if(i+40>=IMPORT.length){b.set(db.doc("meta/codes"),{FANCY:IMPORT.length,STATIONERY:0});b.set(db.doc("meta/setup"),{stock1:true},{merge:true});}
+      await b.commit();
+    }
+    const n=(await db.collection("products").get()).size;
+    cart={};freeCart={};
+    msg=n>=IMPORT.length?note(n+" items saved in the database, codes "+CODEP.FANCY+"01 to "+CODEP.FANCY+String(IMPORT.length).padStart(2,"0")+". Now set the prices in the Stock tab.","ok"):note("Only "+n+" of "+IMPORT.length+" items were saved. Press Reload starting stock list again.","err");
+  }catch(e){msg=note(e.message,"err");}
+  render(true);
+}
+async function applyPrices(){
+  if(needNet())return;
+  const low=x=>String(x).trim().toLowerCase(),b=db.batch();let n=0,miss=0;
+  IMPORT.forEach(([c,base,v,q,u,pr,mp])=>{
+    if(!pr)return;const nm=low(v?base+" "+v:base),p=S.products.find(x=>low(x.name)===nm);
+    if(!p){miss++;return;}
+    if(!(p.price>0)){b.update(db.doc("products/"+p.id),{price:pr,mrp:mp||0});n++;}
+  });
+  if(!n){msg=note(miss?"No items to fill. "+miss+" priced items are not in your stock yet.":"All items from the price list already have prices.","err");render(true);return;}
+  try{await b.commit();msg=note("Prices filled for "+n+" items"+(miss?" ("+miss+" price-list items are not in your stock)":"")+". Items that already had a price were not changed.","ok");}catch(e){msg=note(e.message,"err");}
+  render(true);
+}
+async function mkCodes(){
+  if(needNet())return;
+  try{
+    const r=db.doc("meta/codes"),d=await r.get(),cd=d.exists?d.data():{},b=db.batch();
+    SECS.forEach(x=>{let num=Math.max(cd[x]||0,maxCode(x));S.products.filter(p=>secOf(p)===x&&!p.code).forEach(p=>{num++;b.update(db.doc("products/"+p.id),{code:CODEP[x]+String(num).padStart(2,"0")});});cd[x]=num;});
+    b.set(r,cd);await b.commit();msg=note("Codes given to items without a code.","ok");
+  }catch(e){msg=note(e.message,"err");}
+  render(true);
+}
+async function wipeStock(){
+  if(needNet())return;
+  if(!confirm("Delete ALL stock items and offers? Bills are kept. This cannot be undone."))return;
+  if(prompt("Type DELETE to confirm:")!=="DELETE")return;
+  try{
+    const docs=[...(await db.collection("products").get()).docs,...(await db.collection("offers").get()).docs];
+    for(let i=0;i<docs.length;i+=400){const b=db.batch();docs.slice(i,i+400).forEach(d=>b.delete(d.ref));await b.commit();}
+    await db.doc("meta/codes").set({FANCY:0,STATIONERY:0});
+    cart={};freeCart={};msg=note("All stock items deleted. Add your new items in the Stock tab. Codes start again from TTF01 and TTS01.","ok");
+  }catch(e){msg=note(e.message,"err");}
+  render(true);
+}
+function openEdit(id){
+  const p=prodById(id);if(!p)return;
+  $("#dlg").innerHTML=`<h3 style="margin-top:0">Edit item</h3>
+  <label class="mute">Code</label><input id="ek" value="${esc(p.code||"")}"><label class="mute">Name</label><input id="en" value="${esc(p.name)}">
+  <label class="mute">Unit (pc, box, pack - optional)</label><input id="eu" value="${esc(p.unit||"")}"><label class="mute">Section</label><select id="es">${SECS.map(x=>`<option ${secOf(p)===x?"selected":""}>${x}</option>`).join("")}</select>
+  <label class="mute">Sub-category</label><input id="ec" list="cl" value="${esc(catOf(p))}">
+  <label class="mute">Display order (optional number, smaller shows first)</label><input id="eo" type="number" value="${p.ord||""}">
+  <div class="row" style="margin-top:12px"><button data-act="close">Cancel</button><button class="pri" data-act="saveedit" data-v="${p.id}">Save</button></div>`;
+  $("#dlg").showModal();
+}
+function saveEdit(id){
+  const n=$("#en").value.trim(),c=$("#ec").value.trim().toUpperCase();
+  if(!n||!c){alert("Enter the name and sub-category.");return;}
+  const k=$("#ek").value.trim().toUpperCase();if(k&&S.products.some(p=>p.id!==id&&p.code===k)){alert("This code is already used by another item.");return;}
+  db.doc("products/"+id).update({code:k,name:n,unit:$("#eu").value.trim(),...(n!==(prodById(id)||{}).name?{base:null,var:null}:{}),sec:$("#es").value,cat:c,ord:Math.floor(+$("#eo").value||0)}).then(()=>$("#dlg").close()).catch(err);
+}
+function addPay(id){
+  const o=S.orders.find(x=>x.id===id);if(!o)return;
+  const d=due(o),v=prompt("Payment received now (balance Rs "+fmt(d)+"):",d);if(v===null)return;
+  const a=Math.min(d,Math.max(0,+v||0));if(!(a>0))return;
+  db.doc("orders/"+id).update({paid:Math.min(o.total,(o.paid||0)+a)}).then(()=>{msg=note("Payment saved.","ok");render(true);}).catch(err);
+}
+function csv(name,rows){
+  const t=rows.map(r=>r.map(c=>'"'+String(c==null?"":c).replace(/"/g,'""')+'"').join(",")).join("\r\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+t],{type:"text/csv"}));
+  a.download=name+"-"+new Date().toISOString().slice(0,10)+".csv";document.body.appendChild(a);a.click();a.remove();
+}
+
+/* ===== EDIT A SAVED BILL ===== */
+function ebCalc(){
+  const L=eb.items.filter(i=>!i.free),gross=sum(L,i=>i.qty*i.price),idisc=Math.round(sum(L,i=>i.disc||0)*100)/100,net=gross-idisc,less=Math.min(net,Math.max(0,+eb.less||0)),rt=Math.max(0,+eb.ret||0);
+  return {gross,idisc,less,rt,total:Math.max(0,Math.round((net-less-rt)*100)/100),pct:net>0?Math.round(less/net*10000)/100:0};
+}
+function ebTotHTML(){
+  const T=ebCalc(),R=(a,b,bold)=>`<div class="row" style="margin-top:2px">${bold?`<b>${a}</b><b>${b}</b>`:`<span>${a}</span><span>${b}</span>`}</div>`;
+  return R("Gross total",money(T.gross))+(T.idisc?R("Item discounts","- "+money(T.idisc)):"")+(T.less?R("Bill discount "+T.pct+"%","- "+money(T.less)):"")+(T.rt?R("Return amount","- "+money(T.rt)):"")+R("Total value",money(T.total),true);
+}
+const ebOpts=()=>{const q=ebsq.trim().toLowerCase(),sec=eb.o.sec||"FANCY";return S.products.filter(p=>secOf(p)===sec&&(!q||(p.name+" "+(p.code||"")).toLowerCase().includes(q))).slice(0,200).map(p=>`<option value="${p.id}">${p.code?esc(p.code)+" - ":""}${esc(p.name)} (stock ${p.stock}, Rs ${fmt(p.price)})</option>`).join("");};
+function openBillEdit(id){
+  if(needNet())return;
+  const o=S.orders.find(x=>x.id===id);if(!o||o.status!=="active"){msg=note("This bill cannot be edited.","err");render(true);return;}
+  eb={id:o.id,o:{id:o.id,sec:o.sec,inv:o.inv,offNo:o.offNo},items:o.items.map(i=>({...i})),shop:o.shop||"",addr:o.addr||"",tel:o.tel||"",remark:o.remark||"",pay:o.pay||"Cash",paid:o.pay==="Credit"?(o.paid||0):0,less:o.less||0,ret:o.ret||0};
+  ebsq="";tab="edit";msg="";render(true);scrollTo(0,0);
+}
+function editHTML(){
+  if(!eb)return '<div class="card mute">Nothing to edit.</div>';
+  const rows=eb.items.map((i,k)=>`<div class="ebi"><div class="row"><b>${i.code?esc(i.code)+" ":""}${esc(i.name)}${i.free?' <span class="badge">FREE</span>':""}</b><button class="sm" data-act="ebdel" data-v="${k}">Remove</button></div>
+    <div class="irow"><div><span class="mute">Qty</span><input data-f="ebq" data-i="${k}" type="number" inputmode="numeric" min="1" value="${i.qty}"></div>${i.free?"":`<div><span class="mute">Price</span><input data-f="ebp" data-i="${k}" type="number" inputmode="decimal" step="0.01" min="0" value="${i.price}"></div><div><span class="mute">Discount Rs</span><input data-f="ebd" data-i="${k}" type="number" inputmode="decimal" step="0.01" min="0" value="${i.disc||""}"></div><div><span class="mute">Line total</span><b class="ebl" data-i="${k}">${money(i.qty*i.price-(i.disc||0))}</b></div>`}</div></div>`).join("");
+  return `<div class="card"><div class="row"><b>Edit bill ${invNo(eb.o)} (${eb.o.sec})</b><button class="sm" data-act="ebclose">Close</button></div><div class="mute">Stock updates automatically when you change quantities. A price changed here applies only to this bill, the stock price does not change.</div></div>
+  <div class="card"><b>Customer</b><div class="grid"><input data-f="ebshop" placeholder="Customer / shop name" value="${esc(eb.shop)}"><input data-f="ebaddr" placeholder="Address" value="${esc(eb.addr)}"><input data-f="ebtel" type="tel" placeholder="Mobile number" value="${esc(eb.tel)}"><input data-f="ebrem" placeholder="Remark" value="${esc(eb.remark)}"></div></div>
+  <div class="card"><b>Items</b>${rows}</div>
+  <div class="card"><b>Add another item</b><div class="grid"><input data-f="ebsq" placeholder="Search item or code" value="${esc(ebsq)}"><select id="ebsel">${ebOpts()}</select><div class="row"><input id="ebnq" type="number" inputmode="numeric" min="1" value="1" style="flex:1"><button data-act="ebadd">Add to bill</button></div></div></div>
+  <div class="card"><div class="two"><input data-f="ebless" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Bill discount (Rs)" value="${eb.less||""}"><input data-f="ebret" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Return amount (Rs)" value="${eb.ret||""}"></div>
+  <label class="mute" style="display:block;margin-top:10px">Payment</label><select data-f="ebpay">${PAY.map(x=>`<option ${eb.pay==x?"selected":""}>${x}</option>`).join("")}</select>
+  <input id="ebpaid" data-f="ebpaid" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Paid so far (Rs)" value="${eb.paid||""}" style="margin-top:8px;${eb.pay==="Credit"?"":"display:none"}">
+  <div class="mute" style="margin-top:6px">Cash and Cheque mean fully paid. For Credit, enter the amount paid so far.</div></div>
+  <div class="card" id="ebtot">${ebTotHTML()}</div>
+  <div class="bar"><div><span class="mute">Changes apply to this bill and the stock</span><button class="pri" data-act="ebsave">Save changes</button></div></div>`;
+}
+async function saveBillEdit(){
+  if(needNet())return;
+  const it=eb.items.map(i=>{const q=Math.floor(+i.qty)||0,pz=i.free?0:Math.max(0,+i.price||0);return {...i,qty:q,price:pz,disc:i.free?0:Math.min(q*pz,Math.max(0,+i.disc||0))};}).filter(i=>i.qty>0);
+  if(!eb.shop.trim()){msg=note("Enter the customer name.","err");render(true);return;}
+  if(!it.length){msg=note("The bill needs at least one item. To remove the whole bill use Cancel bill.","err");render(true);return;}
+  const L=it.filter(i=>!i.free),gross=sum(L,i=>i.qty*i.price),idisc=Math.round(sum(L,i=>i.disc)*100)/100,net=gross-idisc,less=Math.min(net,Math.max(0,Math.round((+eb.less||0)*100)/100)),rt=Math.max(0,+eb.ret||0),total=Math.max(0,Math.round((net-less-rt)*100)/100),pct=net>0?Math.round(less/net*10000)/100:0;
+  const paid=eb.pay==="Credit"?Math.min(total,Math.max(0,+eb.paid||0)):total,by=user.role==="admin"?"Admin":user.name,id=eb.id,e0=eb;
+  try{
+    const r=await db.runTransaction(async t=>{
+      const oref=db.doc("orders/"+id),os=await t.get(oref);
+      if(!os.exists||os.data().status!=="active")return {err:"This bill is cancelled or missing."};
+      const o=os.data(),oq={},nq={};
+      o.items.forEach(i=>{oq[i.pid]=(oq[i.pid]||0)+i.qty;});it.forEach(i=>{nq[i.pid]=(nq[i.pid]||0)+i.qty;});
+      const ids=[...new Set([...Object.keys(oq),...Object.keys(nq)])],snaps=await Promise.all(ids.map(x=>t.get(db.doc("products/"+x)))),bad=[],ups=[];
+      ids.forEach((x,k)=>{const d=(nq[x]||0)-(oq[x]||0);if(!d)return;const sn=snaps[k];
+        if(!sn.exists){if(d>0)bad.push(x+": item not found");return;}
+        const st=sn.data().stock-d;if(st<0)bad.push(sn.data().name+": only "+sn.data().stock+" in stock, "+d+" more needed");else ups.push([db.doc("products/"+x),st]);});
+      if(bad.length)return {bad};
+      ups.forEach(([ref,st])=>t.update(ref,{stock:st}));
+      t.update(oref,{items:it,gross,idisc,less,discPct:pct,ret:rt,total,shop:e0.shop.trim(),addr:e0.addr.trim(),tel:e0.tel.trim(),remark:e0.remark.trim(),pay:e0.pay,paid,edited:true,editedAt:Date.now(),editedBy:by,hist:(o.hist||[]).concat([{t:Date.now(),by,total:o.total}])});
+      return {ok:true};
+    });
+    if(r.err)msg=note(r.err,"err");
+    else if(r.bad)msg=note("Not enough stock for this change. "+r.bad.join(" | "),"err");
+    else{msg=note("Bill #"+id+" updated and stock adjusted.","ok");eb=null;tab="bills";saveDraftNow();}
+  }catch(e){msg=note("Could not save changes: "+e.message,"err");}
+  render(true);
+}
+
+/* ===== UNFINISHED BILL IS KEPT ON THE DEVICE ===== */
+let dTimer=null,draftSy=0;
+const dKey=()=>"tt_draft_"+(user?user.uid:"x");
+function saveDraftNow(){
+  if(!user)return;
+  const has=Object.values(cart).some(v=>v>0)||Object.values(freeCart).some(v=>v>0)||shopName.trim()||shopAddr.trim()||shopTel.trim()||remark.trim()||eb||SECS.some(x=>disc[x]||dRs[x]||ret[x]);
+  try{
+    if(has)localStorage.setItem(dKey(),JSON.stringify({t:Date.now(),cart,freeCart,ld,pr,shopName,shopAddr,shopTel,disc,dRs,dsrc,ret,pay,remark,brep,osec,cat,qs,eb,ebsq,sy:window.scrollY||0}));
+    else localStorage.removeItem(dKey());
+  }catch(e){}
+}
+const saveDraft=()=>{clearTimeout(dTimer);dTimer=setTimeout(saveDraftNow,250);};
+const clearDraft=()=>{try{localStorage.removeItem(dKey());}catch(e){}};
+function restoreDraft(){
+  try{
+    const d=JSON.parse(localStorage.getItem(dKey())||"null");if(!d||Date.now()-d.t>864e5)return false;
+    const two=v=>v||{FANCY:"",STATIONERY:""};
+    cart=d.cart||{};freeCart=d.freeCart||{};ld=d.ld||{};pr=d.pr||{};shopName=d.shopName||"";shopAddr=d.shopAddr||"";shopTel=d.shopTel||"";
+    disc=two(d.disc);dRs=two(d.dRs);ret=two(d.ret);dsrc=d.dsrc||{FANCY:"pct",STATIONERY:"pct"};
+    pay=d.pay||"Cash";remark=d.remark||"";brep=d.brep||"";osec=d.osec||"FANCY";cat=d.cat||"";qs=d.qs||"";eb=d.eb||null;ebsq=d.ebsq||"";
+    tab=eb?"edit":"order";draftSy=d.sy||0;msg=note(eb?"Your unfinished bill edit was restored.":"Your unfinished bill was restored. You can continue.","ok");
+    return true;
+  }catch(e){return false;}
+}
+
+/* ===== OFFLINE MODE ===== */
+let qc=null,syncing=false;
+const qKey=()=>"tt_q_"+(user?user.uid:"x");
+const getQ=()=>{if(qc&&qc.k===qKey())return qc.a;let a=[];try{a=JSON.parse(localStorage.getItem(qKey())||"[]");}catch(e){}qc={k:qKey(),a};return a;};
+const setQ=a=>{qc={k:qKey(),a};try{localStorage.setItem(qKey(),JSON.stringify(a));}catch(e){}};
+const nextOff=()=>{let n=0;try{n=+localStorage.getItem("tt_offn")||0;}catch(e){}n++;try{localStorage.setItem("tt_offn",n);}catch(e){}return n;};
+const pend=id=>sum(getQ(),pl=>(pl.need&&pl.need[id])||0);
+const avail=p=>p.stock-pend(p.id);
+const netErr=e=>!!e&&(e.code==="unavailable"||e.code==="deadline-exceeded"||/offline|network|unavailable/i.test(e.message||""));
+const needNet=()=>{if(navigator.onLine)return false;msg=note("This needs internet. Connect and try again.","err");render(true);return true;};
+const oid=v=>/^\d+$/.test(v)?+v:v;
+function buildOrders(pl,P){
+  const sc=x=>x.sec||"FANCY",pz=id=>(pl.pr&&pl.pr[id]>0)?pl.pr[id]:P[id].price,items=pl.lines.map(([id,q])=>({pid:id,name:P[id].name,qty:q,price:pz(id),lp:P[id].price,disc:lineLessX(pl.ldm,id,q,pz(id)),mrp:P[id].mrp||0,code:P[id].code||"",sec:sc(P[id])}));
+  Object.entries(pl.fr).forEach(([id,q])=>items.push({pid:id,name:P[id].name,qty:q,price:0,mrp:P[id].mrp||0,code:P[id].code||"",free:true,sec:sc(P[id])}));
+  const out=[];
+  SECS.forEach(x=>{
+    const its=items.filter(i=>i.sec===x);if(!its.length)return;
+    const gross=sum(its,i=>i.qty*i.price),idisc=Math.round(sum(its,i=>i.disc||0)*100)/100,{dp,less}=discOfX(pl.st,x,gross-idisc),rt=Math.max(0,+pl.ret[x]||0),total=Math.max(0,Math.round((gross-idisc-less-rt)*100)/100);
+    out.push({sec:x,rep:pl.who.name,repId:pl.who.id,repTel:pl.who.tel||"",shop:pl.shop,addr:pl.addr,tel:pl.tel,time:pl.time,items:its,gross,idisc,discPct:dp,less,ret:rt,total,remark:pl.remark,pay:pl.pay,paid:pl.pay==="Credit"?0:total,status:"active"});
+  });
+  return out;
+}
+function saveBillTx(pl){
+  const need=pl.need,ids=Object.keys(need);
+  return db.runTransaction(async t=>{
+    const cref=db.doc("meta/counter"),cs=await t.get(cref),snaps=await Promise.all(ids.map(id=>t.get(db.doc("products/"+id)))),D={},bad=[];
+    ids.forEach((id,i)=>{const sn=snaps[i];if(!sn.exists||sn.data().stock<need[id])bad.push((sn.exists?sn.data().name:id)+": only "+(sn.exists?sn.data().stock:0)+" in stock, needed "+need[id]);else D[id]=sn.data();});
+    if(bad.length)return {bad};
+    const docs=buildOrders(pl,D);
+    ids.forEach(id=>t.update(db.doc("products/"+id),{stock:D[id].stock-need[id]}));
+    const c=cs.exists?cs.data():{},cn={FANCY:c.FANCY||0,STATIONERY:c.STATIONERY||0},made=[];let n=c.n||0;
+    docs.forEach(d=>{n++;d.id=n;d.inv=++cn[d.sec];if(pl.offNo)d.offNo=pl.offNo;t.set(db.doc("orders/"+n),d);made.push(n);});
+    t.set(cref,{n,FANCY:cn.FANCY,STATIONERY:cn.STATIONERY});
+    return {ok:made};
+  });
+}
+function offOrders(){return getQ().flatMap(pl=>buildOrders(pl,pl.snap).map(d=>({...d,id:"O"+pl.offNo+d.sec[0],off:true,offNo:pl.offNo,err:pl.err||""})));}
+const findOrder=id=>S.orders.find(x=>x.id===id)||offOrders().find(x=>x.id===id);
+function queueBill(pl,done){
+  pl.offNo=nextOff();setQ(getQ().concat([pl]));
+  const os=offOrders().filter(o=>o.offNo===pl.offNo);
+  msg=`<div class="note ok">Saved offline as OFF-${String(pl.offNo).padStart(4,"0")}. It uploads automatically when internet is back.<br>`+os.map(o=>`${o.sec}: <button class="sm" data-act="print" data-v="${o.id}">Print invoice</button> <button class="sm" data-act="wa" data-v="${o.id}">WhatsApp</button>`).join("<br>")+`</div>`;
+  done();render(true);
+}
+async function syncQueue(){
+  if(syncing||!navigator.onLine||!user||!db||!getQ().length)return;
+  syncing=true;let up=0;
+  try{
+    for(const pl of getQ().slice()){
+      try{
+        const r=await saveBillTx(pl);
+        if(r.bad)setQ(getQ().map(x=>x.offNo===pl.offNo?{...pl,err:r.bad.join(" | ")}:x));
+        else{setQ(getQ().filter(x=>x.offNo!==pl.offNo));up++;}
+      }catch(e){if(netErr(e))break;setQ(getQ().map(x=>x.offNo===pl.offNo?{...pl,err:e.message}:x));}
+    }
+  }finally{syncing=false;}
+  if(up)msg=note(up+" offline bill(s) uploaded.","ok");
+  render();
+}
+function offBanner(){
+  const n=getQ().length,on=navigator.onLine;
+  if(on&&!n)return "";
+  return `<div class="note ${on?"ok":"err"}">${on?"Internet is back.":"You are offline. Billing still works."} ${n?n+" bill(s) waiting to upload. "+(on?'<button class="sm" data-act="syncnow">Upload now</button>':"They upload automatically when internet is back."):"Bills you save now upload automatically when internet is back."}</div>`;
+}
+function offHTML(){
+  const oq=offOrders();if(!oq.length)return "";
+  return `<div class="catb">Waiting to upload (${oq.length}) ${navigator.onLine?'<button class="sm" data-act="syncnow">Upload now</button>':""}</div>`+oq.map(o=>`<div class="card bill active"><div class="row"><b>${invNo(o)} (${o.sec})</b><span class="badge">NOT UPLOADED</span></div>
+    <div class="mute">${new Date(o.time).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}, Customer: ${esc(o.shop)}, ${esc(o.pay)}</div>
+    <ul class="sel">${o.items.map(i=>`<li>${i.code?esc(i.code)+" ":""}${esc(i.name)} x ${i.qty} ${i.free?"FREE":"= "+money(i.qty*i.price-(i.disc||0))}</li>`).join("")}</ul>
+    <div class="row"><b>${money(o.total)}</b><span><button class="sm" data-act="print" data-v="${o.id}">Print invoice</button> <button class="sm" data-act="wa" data-v="${o.id}">WhatsApp</button> <button class="sm" data-act="offdel" data-v="${o.offNo}">Remove</button></span></div>
+    ${o.err?`<div class="note err">Not uploaded: ${esc(o.err)}</div>`:""}</div>`).join("");
+}
+
+/* ===== EVENTS ===== */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;
+  const a=b.dataset.act,v=b.dataset.v,keep=f=>{const y=scrollY;f();render(true);scrollTo(0,y);};
+  if(a=="role"){lrole=v;loginErr="";render(true);}
+  else if(a=="login")login();
+  else if(a=="tab"){tab=v;msg="";render(true);}
+  else if(a=="logout"){msg="";cart={};freeCart={};clearDraft();auth.signOut();}
+  else if(a=="submit")submitOrder();
+  else if(a=="cancel")openCancel(+v);
+  else if(a=="docancel")doCancel(+v);
+  else if(a=="close")$("#dlg").close();
+  else if(a=="addrep")addRep();
+  else if(a=="delrep"){if(confirm("Remove this rep? They will not be able to log in."))db.doc("refs/"+v).delete().catch(err);}
+  else if(a=="chpass")changePass();
+  else if(a=="addoffer")addOffer();
+  else if(a=="deloffer"){if(confirm("Delete this offer?"))db.doc("offers/"+v).delete().catch(err);}
+  else if(a=="addprod")addProduct();
+  else if(a=="delprod"){const p=prodById(v);if(p&&confirm("Delete "+p.name+"? Old bills keep their record."))db.doc("products/"+v).delete().catch(err);}
+  else if(a=="renprod"){const p=prodById(v),n=p&&prompt("New name:",p.name);if(n&&n.trim())db.doc("products/"+v).update({name:n.trim()}).catch(err);}
+  else if(a=="savephone"){const p=$("#mp").value.trim(),w=user.role==="admin"?db.doc("meta/shop").set({adminTel:p},{merge:true}):db.doc("refs/"+user.uid).update({phone:p});
+    w.then(()=>{if(user.role!=="admin")user.phone=p;msg=note("Phone number saved.","ok");render(true);}).catch(err);}
+  else if(a=="saveshop")db.doc("meta/shop").set({addr:$("#sa").value.trim(),tel:$("#st").value.trim(),maxDisc:$("#sm").value===""?null:Math.min(100,Math.max(0,+$("#sm").value||0))},{merge:true}).then(()=>{msg=note("Shop details saved.","ok");render(true);}).catch(err);
+  else if(a=="addfree"){const id=$("#fsel").value,q=Math.floor(+$("#fqty").value);if(!(q>0)){msg=note("Enter the free quantity.","err");render(true);return;}keep(()=>{freeCart[id]=(freeCart[id]||0)+q;lastFree=id;msg="";});}
+  else if(a=="rmfree")keep(()=>{delete freeCart[v];});
+  else if(a=="sec")keep(()=>{osec=v;cat="";});
+  else if(a=="cat")keep(()=>{cat=v;});
+  else if(a=="inc"||a=="dec")keep(()=>{cart[v]=Math.max(0,(cart[v]||0)+(a=="inc"?1:-1));if(!cart[v]){delete ld[v];delete pr[v];}});
+  else if(a=="wa")shareWA(oid(v));
+  else if(a=="print")printBill(oid(v));
+  else if(a=="offdel"){if(confirm("Remove this offline bill? It will NOT be uploaded."))keep(()=>setQ(getQ().filter(x=>x.offNo!==+v)));}
+  else if(a=="editbill")openBillEdit(+v);
+  else if(a=="ebclose"){eb=null;tab="bills";render(true);}
+  else if(a=="ebdel")keep(()=>{eb.items.splice(+v,1);});
+  else if(a=="ebadd"){const id=$("#ebsel").value,q=Math.max(1,Math.floor(+$("#ebnq").value||1)),p=prodById(id);if(p)keep(()=>{const ex=eb.items.find(i=>i.pid===id&&!i.free);if(ex)ex.qty+=q;else eb.items.push({pid:id,name:p.name,qty:q,price:p.price,lp:p.price,disc:0,mrp:p.mrp||0,code:p.code||"",sec:secOf(p)});});}
+  else if(a=="ebsave")saveBillEdit();
+  else if(a=="syncnow"){if(!navigator.onLine){msg=note("Still offline.","err");render(true);}else syncQueue();}
+  else if(a=="wipe")wipeStock();
+  else if(a=="importstock")importStock();
+  else if(a=="fillprices")applyPrices();
+  else if(a=="mkcodes")mkCodes();
+  else if(a=="edit")openEdit(v);
+  else if(a=="saveedit")saveEdit(v);
+  else if(a=="pay")addPay(+v);
+  else if(a=="csvstock")csv("stock",[["Code","Section","Category","Item","Stock","Ex Factory","Ex Dealer","MRP"]].concat(S.products.map(p=>[p.code||"",secOf(p),p.cat,p.name,p.stock,p.cost,p.price,p.mrp])));
+  else if(a=="csvbills")csv("bills",[["Bill","Date","Section","Rep","Customer","Items","Total","Payment","Paid","Balance","Discount","Remark","Status"]].concat(S.orders.map(o=>[invNo(o),new Date(o.time).toLocaleString(),o.sec||"",o.rep,o.shop,o.items.map(i=>i.name+" x"+i.qty+(i.free?" (FREE)":"")).join("; "),o.total,o.pay||"",o.paid==null?"":o.paid,due(o),Math.round(((o.idisc||0)+(o.less||0))*100)/100,o.remark||"",o.status])));
+});
+
+document.addEventListener("change",e=>{
+  const t=e.target,id=t.dataset.id,f=t.dataset.f;
+  if(!id||!["stock","add","cost","price","mrp"].includes(f))return;
+  const v=Math.max(0,+t.value||0),upd=f=="add"?{stock:F.increment(Math.floor(v))}:f=="stock"?{stock:Math.floor(v)}:{[f]:v};
+  db.doc("products/"+id).update(upd).then(()=>{if(f=="add")t.value="";}).catch(err);
+});
+
+document.addEventListener("input",e=>{
+  const t=e.target,f=t.dataset.f;
+  if(f=="shop"){shopName=t.value;const o=S.orders.find(x=>x.shop===t.value);
+    if(o){if(!shopAddr&&o.addr){shopAddr=o.addr;const e=$('[data-f="addr"]');if(e)e.value=shopAddr;}if(!shopTel&&o.tel){shopTel=o.tel;const e=$('[data-f="tel"]');if(e)e.value=shopTel;}}}
+  else if(f=="addr")shopAddr=t.value;
+  else if(f=="tel")shopTel=t.value;
+  else if(f=="brep")brep=t.value;
+  else if(f=="fsel")lastFree=t.value;
+  else if(f=="qs"){qs=t.value;$("#plist").innerHTML=plistHTML();}
+  else if(f=="pay")pay=t.value;
+  else if(f=="remark")remark=t.value;
+  else if(f&&f.startsWith("eb")&&eb){
+    const k=+t.dataset.i;
+    if(f=="ebshop")eb.shop=t.value;else if(f=="ebaddr")eb.addr=t.value;else if(f=="ebtel")eb.tel=t.value;else if(f=="ebrem")eb.remark=t.value;
+    else if(f=="ebpay"){eb.pay=t.value;const e=$("#ebpaid");if(e)e.style.display=eb.pay==="Credit"?"":"none";}
+    else if(f=="ebpaid")eb.paid=t.value;
+    else if(f=="ebless"){eb.less=t.value;$("#ebtot").innerHTML=ebTotHTML();}
+    else if(f=="ebret"){eb.ret=t.value;$("#ebtot").innerHTML=ebTotHTML();}
+    else if(f=="ebsq"){ebsq=t.value;$("#ebsel").innerHTML=ebOpts();}
+    else if(f=="ebq"||f=="ebp"||f=="ebd"){
+      const i=eb.items[k];if(!i)return;
+      if(f=="ebq")i.qty=Math.max(0,Math.floor(+t.value||0));else if(f=="ebp")i.price=Math.max(0,+t.value||0);else i.disc=Math.max(0,+t.value||0);
+      const l=$('.ebl[data-i="'+k+'"]');if(l&&!i.free)l.textContent=money(i.qty*i.price-(i.disc||0));
+      $("#ebtot").innerHTML=ebTotHTML();
+    }
+  }
+  else if(f=="lp"||f=="lr"||f=="lpr"){
+    const id=t.dataset.id,row=t.closest("[data-line]");if(!prodById(id)||!row)return;
+    if(f=="lpr")pr[id]=t.value;else ld[id]=f=="lp"?{p:t.value,r:"",s:"pct"}:{p:"",r:t.value,s:"rs"};
+    refreshLine(row,id);updateTot();$("#sum").innerHTML=sumHTML();
+  }
+  else if(f=="sq"||f=="sf"){if(f=="sq")sq=t.value;else sf=t.value;$("#srows").innerHTML=stockRows();}
+  else if(f=="bq"||f=="bf"||f=="bs"){if(f=="bq")bq=t.value;else if(f=="bf")bf=t.value;else bsort=t.value;$("#blist").innerHTML=billList();}
+  else if(f=="disc"||f=="ret"||f=="dRs"){const x=t.dataset.sec;({disc,ret,dRs})[f][x]=t.value;if(f=="disc")dsrc[x]="pct";else if(f=="dRs")dsrc[x]="rs";updateTot();$("#sum").innerHTML=sumHTML();}
+  else if(f=="qty"){
+    const q=Math.max(0,Math.floor(+t.value||0)),p=prodById(t.dataset.id);
+    cart[t.dataset.id]=q;if(!q){delete ld[t.dataset.id];delete pr[t.dataset.id];}t.classList.toggle("over",!!p&&q>avail(p));updateTot();$("#sum").innerHTML=sumHTML();const ln=$("#lines");if(ln)ln.innerHTML=linesHTML();
+  }
+});
+
+/* ===== START ===== */
+if(FIREBASE_CONFIG){
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db=firebase.firestore();try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{});}catch(e){}auth=firebase.auth();F=firebase.firestore.FieldValue;
+  auth2=firebase.initializeApp(FIREBASE_CONFIG,"creator").auth(); // only used to create rep logins
+  auth.onAuthStateChanged(async u=>{
+    unsubs.forEach(f=>f());unsubs=[];user=null;S={products:[],orders:[],refs:[],offers:[],shop:{}};
+    if(u){
+      if(u.email===ADMIN_EMAIL)user={role:"admin",uid:u.uid};
+      else{
+        try{
+          const d=await db.doc("refs/"+u.uid).get();
+          if(d.exists)user={role:"rep",uid:u.uid,id:d.data().id,name:d.data().name,phone:d.data().phone||""};
+          else{loginErr="This login has been removed by the admin.";await auth.signOut();}
+        }catch(e){loginErr="Could not load your account. Check your internet.";await auth.signOut();}
+      }
+    }
+    ready=true;
+    if(user){tab="order";restoreDraft();startListening();syncQueue();}
+    render(true);
+  });
+}
+["input","change","click"].forEach(ev=>document.addEventListener(ev,saveDraft));
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")saveDraftNow();});
+window.addEventListener("pagehide",saveDraftNow);
+window.addEventListener("online",()=>{syncQueue();render(true);});
+window.addEventListener("offline",()=>render(true));
+setInterval(()=>{if(user&&navigator.onLine&&getQ().length)syncQueue();},30000);
+// Optional extras: only used if sw.js / manifest.json were uploaded next to index.html. The app works fine without them.
+if(typeof fetch==="function"){
+  fetch("sw.js",{method:"HEAD",cache:"no-store"}).then(r=>{if(r.ok&&"serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});}).catch(()=>{});
+  fetch("manifest.json",{method:"HEAD",cache:"no-store"}).then(r=>{if(r.ok){const l=document.createElement("link");l.rel="manifest";l.href="manifest.json";document.head.appendChild(l);}}).catch(()=>{});
+}
+render(true);
+</script>
+</body>
+</html>
